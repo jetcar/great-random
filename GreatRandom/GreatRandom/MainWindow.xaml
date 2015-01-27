@@ -9,7 +9,7 @@
     <ScrollViewer>
         <DockPanel>
 
-            <Grid DockPanel.Dock="Top">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <StackPanel Orientation="Horizontal">
 
 
@@ -28,13 +28,13 @@
                             FontWeight="Bold"
                             Padding="10" />
                 </StackPanel>
-                <StackPanel HorizontalAlignment="Center"
+                <StackPanel 
                             VerticalAlignment="Center"
                             Orientation="Horizontal">
                     <Button Click="numberOfGamesClick" Content="1" />
                     <Button Click="numberOfGamesClick" Content="5" />
                     <Button Click="numberOfGamesClick" Content="10" />
-                    <TextBox Text="{Binding NumberOfGames, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <TextBox Width="50" Text="{Binding NumberOfGames, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Right">
                     <Label VerticalAlignment="Center" Content="{Binding SpendMoney}" />
@@ -42,7 +42,7 @@
 
 
                 </StackPanel>
-            </Grid>
+            </StackPanel>
             <ListView DockPanel.Dock="Top" ItemsSource="{Binding MyTickets}">
                 <ListView.ItemTemplate>
                     <DataTemplate DataType="greatRandom:Ticket">
@@ -65,9 +65,9 @@
                                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                                     <Label Content="{Binding Numbers.Count}" />
                                     <Label Content="{Binding WonAmount}" />
-                                    <TextBox Width="50" Text="{Binding Amount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox Width="50" Text="{Binding Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
-                                <Button Content="X" Click="Remove_Ticket"></Button>
+                                <Button Click="Remove_Ticket" Content="X" />
                             </StackPanel>
                             <ItemsControl ItemsSource="{Binding Results}">
                                 <ItemsControl.ItemTemplate>
@@ -75,7 +75,9 @@
                                         <StackPanel Orientation="Horizontal">
                                             <Label Content="{Binding GameNumber}" />
                                             <Label Content="{Binding WonNumbersAmount}" />
-                                            <Label Padding="0" Margin="0" Content="/" />
+                                            <Label Margin="0"
+                                                   Content="/"
+                                                   Padding="0" />
                                             <Label Content="{Binding WonAmount}" />
                                         </StackPanel>
                                     </DataTemplate>
@@ -90,17 +92,17 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                 <Button Width="50"
-                    Height="30"
-                    HorizontalAlignment="Left"
-                    Click="AddTicket"
-                    Content="Add"
-                     />
-                <TextBox Text="{Binding TicketStake,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                
+                        Height="30"
+                        HorizontalAlignment="Left"
+                        Click="AddTicket"
+                        Content="Add" />
+                <TextBox Width="50" Text="{Binding TicketStake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Width="50" Text="{Binding TicketNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
             </StackPanel>
-            
+
             <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Numbers}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="greatRandom:Number">
@@ -109,7 +111,8 @@
                                       Click="SelectNumber"
                                       Content="{Binding Value}"
                                       IsChecked="{Binding IsChecked,
-                                                          Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                                          Mode=TwoWay,
+                                                          UpdateSourceTrigger=PropertyChanged}" />
 
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

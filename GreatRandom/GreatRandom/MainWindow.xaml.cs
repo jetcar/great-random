@@ -125,6 +125,17 @@ namespace GreatRandom
             }
         }
 
+        public int TicketNumbers
+        {
+            get { return _ticketNumbers; }
+            set
+            {
+                if (value == _ticketNumbers) return;
+                _ticketNumbers = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -137,41 +148,46 @@ namespace GreatRandom
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
         private void StartClick(object sender, RoutedEventArgs e)
         {
-            byte[] randomNumber = new byte[1];
-            WonAmount = 0;
-            foreach (var myTicket in MyTickets)
+            new Thread(() =>
             {
-                SpendMoney += NumberOfGames * myTicket.Amount;
-            }
-            var count = 0;
-            while (count < NumberOfGames)
-            {
-                var numbers = new HashSet<byte>();
-                while (numbers.Count < 20)
+                byte[] randomNumber = new byte[1];
+                WonAmount = 0;
+                foreach (var myTicket in MyTickets)
                 {
-                    rngCsp.GetBytes(randomNumber);
-
-                    byte value = (byte)(randomNumber[0] % amount + 1);
-                    if (numbers.Contains(value))
-                        continue;
-                    numbers.Add(value);
+                    SpendMoney += NumberOfGames * myTicket.Amount;
                 }
-                var result = new Ticket();
-                foreach (var number in numbers)
+                var count = 0;
+                while (count < NumberOfGames)
                 {
-                    result.Numbers.Add(new Number(number));
+                    var numbers = new HashSet<byte>();
+                    while (numbers.Count < 20)
+                    {
+                        rngCsp.GetBytes(randomNumber);
+
+                        byte value = (byte)(randomNumber[0] % amount + 1);
+                        if (numbers.Contains(value))
+                            continue;
+                        numbers.Add(value);
+                    }
+                    var result = new Ticket();
+                    foreach (var number in numbers)
+                    {
+                        result.Numbers.Add(new Number(number));
+                    }
+                    Calculate.CalculateTickets(numbers, MyTickets);
+                    result.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
+                    Dispatcher.CurrentDispatcher.Invoke(() =>
+                    {
+                        Results.Add(result);
+                    });
+                    count++;
                 }
-                Calculate.CalculateTickets(numbers, MyTickets);
-                result.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
-                Results.Add(result);
-                count++;
-            }
 
-            foreach (var myTicket in MyTickets)
-            {
-                WonAmount += myTicket.WonAmount;
-            }
-
+                foreach (var myTicket in MyTickets)
+                {
+                    WonAmount += myTicket.WonAmount;
+                }
+            }).Start();
 
         }
 
@@ -203,11 +219,12 @@ namespace GreatRandom
         private int _numberOfGames = 1;
         private readonly Calculate _calculate;
         private double _ticketStake = 1;
+        private int _ticketNumbers = 10;
 
         private void SelectNumber(object sender, RoutedEventArgs e)
         {
-            var thisButtno = sender as ToggleButton;
-            var number = thisButtno.DataContext as Number;
+            var toggleButton = sender as ToggleButton;
+            var number = toggleButton.DataContext as Number;
             if (number.IsChecked)
             {
                 currentTicket.Numbers.Add(new Number(number.Value));
@@ -222,6 +239,19 @@ namespace GreatRandom
 
         private void AddTicket(object sender, RoutedEventArgs e)
         {
+            if (currentTicket.Numbers.Count == 0)
+            {
+                var random = new Random();
+                while (currentTicket.Numbers.Count < TicketNumbers)
+                {
+                    var rnd = random.Next(1, amount + 1);
+                    if (currentTicket.Numbers.Any(x => x.Value == rnd))
+                        continue;
+                    currentTicket.Numbers.Add(new Number((byte)rnd));
+                }
+            }
+
+
             currentTicket.Amount = TicketStake;
             MyTickets.Add(currentTicket);
             foreach (var number in Numbers)

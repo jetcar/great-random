@@ -9,6 +9,12 @@ namespace GreatRandom
 {
     public class SortableObservableCollection<T> : ObservableCollection<T>
     {
+
+        public SortableObservableCollection()
+        {
+            int i = 0;
+        }
+
         public void Sort<TKey>(Func<T, TKey> keySelector, System.ComponentModel.ListSortDirection direction)
         {
             switch (direction)

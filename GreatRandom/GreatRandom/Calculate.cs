@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace GreatRandom
 {
@@ -41,6 +44,7 @@ namespace GreatRandom
                                 break;
                             case 2:
                                 wonAmount = myTicket.Amount * 5;
+                                MessageBox.Show("top win " + wonAmount);
                                 break;
                         }
 
@@ -57,6 +61,7 @@ namespace GreatRandom
                                 break;
                             case 3:
                                 wonAmount = myTicket.Amount * 11;
+                                MessageBox.Show("top win " + wonAmount + " " +myTicket.Results.Count);
                                 break;
                         }
                         break;
@@ -75,6 +80,7 @@ namespace GreatRandom
                                 break;
                             case 4:
                                 wonAmount = myTicket.Amount * 20;
+                                MessageBox.Show("top win " + wonAmount + " " +myTicket.Results.Count);
                                 break;
                         }
                         break;
@@ -96,6 +102,7 @@ namespace GreatRandom
                                 break;
                             case 5:
                                 wonAmount = myTicket.Amount * 50;
+                                MessageBox.Show("top win " + wonAmount + " " +myTicket.Results.Count);
                                 break;
                         }
                         break;
@@ -119,6 +126,7 @@ namespace GreatRandom
                                 break;
                             case 6:
                                 wonAmount = myTicket.Amount * 200;
+                                MessageBox.Show("top win " + wonAmount + " " +myTicket.Results.Count);
                                 break;
                         }
                         break;
@@ -145,6 +153,7 @@ namespace GreatRandom
                                 break;
                             case 7:
                                 wonAmount = myTicket.Amount * 600;
+                                MessageBox.Show("top win " + wonAmount + " " +myTicket.Results.Count);
                                 break;
                         }
                         break;
@@ -174,6 +183,7 @@ namespace GreatRandom
                                 break;
                             case 8:
                                 wonAmount = myTicket.Amount * 2000;
+                                MessageBox.Show("top win " + wonAmount + " " +myTicket.Results.Count);
                                 break;
                         }
                         break;
@@ -205,6 +215,7 @@ namespace GreatRandom
                                 break;
                             case 9:
                                 wonAmount = myTicket.Amount * 7000;
+                                MessageBox.Show("top win " + wonAmount + " " +myTicket.Results.Count);
                                 break;
                         }
                         break;
@@ -239,13 +250,17 @@ namespace GreatRandom
                                 break;
                             case 10:
                                 wonAmount = myTicket.Amount * 20000;
+                                MessageBox.Show("top win " + wonAmount + " " +myTicket.Results.Count);
                                 break;
                         }
                         break;
                 }
                 myTicket.WonAmount += wonAmount;
-                myTicket.Results.Add(new Result(myTicket.Results.Count+1,wonNumbersAmount, wonAmount));
-                myTicket.Results.Sort(x=>x.GameNumber,ListSortDirection.Descending);
+                Dispatcher.CurrentDispatcher.Invoke(() =>
+                {
+                    myTicket.Results.Add(new Result(myTicket.Results.Count + 1, wonNumbersAmount, wonAmount));
+                    myTicket.Results.Sort(x => x.GameNumber, ListSortDirection.Descending);
+                });
             }
         }
     }

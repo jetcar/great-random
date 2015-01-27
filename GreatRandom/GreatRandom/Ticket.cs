@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
+using System.Windows.Threading;
 using GreatRandom.Annotations;
 
 namespace GreatRandom
@@ -10,8 +12,17 @@ namespace GreatRandom
         private SortableObservableCollection<Number> _numbers = new SortableObservableCollection<Number>();
         private double _amount = 1;
         private double _wonAmount;
-        private SortableObservableCollection<Result> _results = new SortableObservableCollection<Result>();
+        private SortableObservableCollection<Result> _results;
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public Ticket()
+        {
+
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                _results = new SortableObservableCollection<Result>();
+            });
+        }
 
         public SortableObservableCollection<Number> Numbers
         {
