@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Media;
 
 namespace GreatRandom
@@ -243,19 +244,22 @@ namespace GreatRandom
                         break;
                 }
                 myTicket.WonAmount += wonAmount;
-                myTicket.Results.Add(new Result(wonNumbersAmount, wonAmount));
+                myTicket.Results.Add(new Result(myTicket.Results.Count+1,wonNumbersAmount, wonAmount));
+                myTicket.Results.Sort(x=>x.GameNumber,ListSortDirection.Descending);
             }
         }
     }
 
     public class Result
     {
-        public Result(int wonNumbersAmount, double wonAmount)
+        public Result(int index,int wonNumbersAmount, double wonAmount)
         {
+            GameNumber = index;
             WonAmount = wonAmount;
             WonNumbersAmount = wonNumbersAmount;
         }
 
+        public int GameNumber { get; set; }
         public int WonNumbersAmount { get; set; }
 
         public double WonAmount { get; set; }

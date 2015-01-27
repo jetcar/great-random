@@ -73,8 +73,9 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="greatRandom:Result">
                                         <StackPanel Orientation="Horizontal">
+                                            <Label Content="{Binding GameNumber}" />
                                             <Label Content="{Binding WonNumbersAmount}" />
-                                            <Label Content="/" />
+                                            <Label Padding="0" Margin="0" Content="/" />
                                             <Label Content="{Binding WonAmount}" />
                                         </StackPanel>
                                     </DataTemplate>

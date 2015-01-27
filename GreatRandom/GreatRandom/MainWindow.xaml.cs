@@ -138,7 +138,7 @@ namespace GreatRandom
         private void StartClick(object sender, RoutedEventArgs e)
         {
             byte[] randomNumber = new byte[1];
-
+            WonAmount = 0;
             foreach (var myTicket in MyTickets)
             {
                 SpendMoney += NumberOfGames * myTicket.Amount;
