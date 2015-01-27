@@ -9,7 +9,7 @@
     <ScrollViewer>
         <DockPanel>
 
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal">
 
 
@@ -20,6 +20,7 @@
                             FontSize="20"
                             FontWeight="Bold"
                             Padding="10" />
+                    <Label Content="{Binding SpendTime}"></Label>
                     <Button Margin="20"
                             HorizontalAlignment="Left"
                             Click="Reset_click"
@@ -28,9 +29,7 @@
                             FontWeight="Bold"
                             Padding="10" />
                 </StackPanel>
-                <StackPanel 
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal">
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                     <Button Click="numberOfGamesClick" Content="1" />
                     <Button Click="numberOfGamesClick" Content="5" />
                     <Button Click="numberOfGamesClick" Content="10" />
@@ -43,6 +42,17 @@
 
                 </StackPanel>
             </StackPanel>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <Button Width="50"
+                        Height="30"
+                        HorizontalAlignment="Left"
+                        Click="AddTicket"
+                        Content="Add" />
+                <TextBox Width="50" Text="{Binding TicketStake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Width="50" Text="{Binding TicketNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            </StackPanel>
+
             <ListView DockPanel.Dock="Top" ItemsSource="{Binding MyTickets}">
                 <ListView.ItemTemplate>
                     <DataTemplate DataType="greatRandom:Ticket">
@@ -84,7 +94,7 @@
                                 </ItemsControl.ItemTemplate>
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
+                                        <VirtualizingStackPanel Orientation="Horizontal" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
@@ -92,21 +102,11 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <Button Width="50"
-                        Height="30"
-                        HorizontalAlignment="Left"
-                        Click="AddTicket"
-                        Content="Add" />
-                <TextBox Width="50" Text="{Binding TicketStake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Width="50" Text="{Binding TicketNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-            </StackPanel>
 
             <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Numbers}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="greatRandom:Number">
-                        <ToggleButton Width="20"
+                        <ToggleButton 
                                       Height="20"
                                       Click="SelectNumber"
                                       Content="{Binding Value}"
@@ -118,7 +118,7 @@
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel />
+                        <UniformGrid Columns="8"  />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
@@ -134,7 +134,7 @@
                                 </ItemsControl.ItemTemplate>
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
+                                        <VirtualizingStackPanel Orientation="Horizontal" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>

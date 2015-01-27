@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GreatRandom
 {
     public class SortableObservableCollection<T> : ObservableCollection<T>
     {
-
-        public SortableObservableCollection()
-        {
-            int i = 0;
-        }
 
         public void Sort<TKey>(Func<T, TKey> keySelector, System.ComponentModel.ListSortDirection direction)
         {

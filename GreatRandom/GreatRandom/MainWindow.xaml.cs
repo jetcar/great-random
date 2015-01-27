@@ -32,7 +32,7 @@ namespace GreatRandom
         private IDictionary<int, Number> _numbersDict = new Dictionary<int, Number>();
         private byte amount = 64;
         private SortableObservableCollection<Ticket> _myTickets = new SortableObservableCollection<Ticket>();
-
+        public static Dispatcher DispatcherThread;
         public MainWindow()
         {
             for (byte i = 0; i < amount; i++)
@@ -42,6 +42,7 @@ namespace GreatRandom
                 _numbersDict.Add(i + 1, number);
             }
             InitializeComponent();
+            DispatcherThread = Dispatcher.CurrentDispatcher;
         }
 
 
@@ -100,13 +101,21 @@ namespace GreatRandom
         public SortableObservableCollection<Ticket> Results
         {
             get { return _results; }
-            set { _results = value; }
+            set
+            {
+                _results = value;
+                OnPropertyChanged();
+            }
         }
 
         public SortableObservableCollection<Ticket> MyTickets
         {
             get { return _myTickets; }
-            set { _myTickets = value; }
+            set
+            {
+                _myTickets = value;
+                OnPropertyChanged();
+            }
         }
 
         public Calculate Calculate
@@ -136,6 +145,17 @@ namespace GreatRandom
             }
         }
 
+        public TimeSpan SpendTime
+        {
+            get { return _spendTime; }
+            set
+            {
+                if (value.Equals(_spendTime)) return;
+                _spendTime = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -148,6 +168,7 @@ namespace GreatRandom
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
         private void StartClick(object sender, RoutedEventArgs e)
         {
+            var startDate = DateTime.Now;
             new Thread(() =>
             {
                 byte[] randomNumber = new byte[1];
@@ -164,7 +185,7 @@ namespace GreatRandom
                     {
                         rngCsp.GetBytes(randomNumber);
 
-                        byte value = (byte)(randomNumber[0] % amount + 1);
+                        var value = (byte)(randomNumber[0] % amount + 1);
                         if (numbers.Contains(value))
                             continue;
                         numbers.Add(value);
@@ -174,11 +195,13 @@ namespace GreatRandom
                     {
                         result.Numbers.Add(new Number(number));
                     }
+
                     Calculate.CalculateTickets(numbers, MyTickets);
+
                     result.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
-                    Dispatcher.CurrentDispatcher.Invoke(() =>
+                    DispatcherThread.Invoke(() =>
                     {
-                        Results.Add(result);
+                        Results.Insert(0,result);
                     });
                     count++;
                 }
@@ -187,6 +210,8 @@ namespace GreatRandom
                 {
                     WonAmount += myTicket.WonAmount;
                 }
+                SpendTime = DateTime.Now - startDate;
+
             }).Start();
 
         }
@@ -199,12 +224,12 @@ namespace GreatRandom
                 numberStatistic.IsChecked = true;
             }
             SpendMoney = 0;
-            Results.Clear();
+            Results = new SortableObservableCollection<Ticket>();
             foreach (var number in Numbers)
             {
                 number.IsChecked = false;
             }
-            MyTickets.Clear();
+            MyTickets = new SortableObservableCollection<Ticket>();
             currentTicket = new Ticket();
             WonAmount = 0;
             GamesPlayed = 0;
@@ -220,6 +245,7 @@ namespace GreatRandom
         private readonly Calculate _calculate;
         private double _ticketStake = 1;
         private int _ticketNumbers = 10;
+        private TimeSpan _spendTime;
 
         private void SelectNumber(object sender, RoutedEventArgs e)
         {
@@ -231,7 +257,7 @@ namespace GreatRandom
             }
             else
             {
-                currentTicket.Numbers.Remove(new Number(number.Value));
+                currentTicket.Numbers.Remove(currentTicket.Numbers.First(x=>x.Value == number.Value));
             }
             currentTicket.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
 

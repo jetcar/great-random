@@ -12,17 +12,8 @@ namespace GreatRandom
         private SortableObservableCollection<Number> _numbers = new SortableObservableCollection<Number>();
         private double _amount = 1;
         private double _wonAmount;
-        private SortableObservableCollection<Result> _results;
+        private SortableObservableCollection<Result> _results = new SortableObservableCollection<Result>();
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public Ticket()
-        {
-
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                _results = new SortableObservableCollection<Result>();
-            });
-        }
 
         public SortableObservableCollection<Number> Numbers
         {
