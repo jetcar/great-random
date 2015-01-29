@@ -276,6 +276,7 @@ namespace GreatRandom
                     currentTicket.Numbers.Add(new Number((byte)rnd));
                 }
             }
+            currentTicket.Numbers.Sort(x=>x.Value,ListSortDirection.Ascending);
 
 
             currentTicket.Amount = TicketStake;
