@@ -305,6 +305,8 @@ namespace GreatRandom
                 }
 
             }
+
+
             else
             {
                 currentTicket.Amount = TicketStake;
