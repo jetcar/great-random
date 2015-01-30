@@ -33,6 +33,7 @@ namespace GreatRandom
         private byte amount = 64;
         private SortableObservableCollection<Ticket> _myTickets = new SortableObservableCollection<Ticket>();
         public static Dispatcher DispatcherThread;
+        public DispatcherTimer timer = new DispatcherTimer();
         public MainWindow()
         {
             for (byte i = 0; i < amount; i++)
@@ -41,8 +42,15 @@ namespace GreatRandom
                 Numbers.Add(number);
                 _numbersDict.Add(i + 1, number);
             }
+            timer.Interval = new TimeSpan(0,0,0,0,100);
+            timer.Tick += timer_Tick;
             InitializeComponent();
             DispatcherThread = Dispatcher.CurrentDispatcher;
+        }
+
+        void timer_Tick(object sender, EventArgs e)
+        {
+            Results.NotifyAll();
         }
 
 
@@ -167,6 +175,17 @@ namespace GreatRandom
             }
         }
 
+        public int ResultsCount
+        {
+            get { return _resultsCount; }
+            set
+            {
+                if (value == _resultsCount) return;
+                _resultsCount = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -179,9 +198,11 @@ namespace GreatRandom
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
         private void StartClick(object sender, RoutedEventArgs e)
         {
-            var startDate = DateTime.Now;
+            timer.Start();
             new Thread(() =>
             {
+                var startDate = DateTime.Now;
+
                 byte[] randomNumber = new byte[1];
                 WonAmount = 0;
                 foreach (var myTicket in MyTickets)
@@ -191,6 +212,7 @@ namespace GreatRandom
                 var count = 0;
                 while (count < NumberOfGames)
                 {
+
                     var numbers = new HashSet<byte>();
                     while (numbers.Count < 20)
                     {
@@ -206,21 +228,29 @@ namespace GreatRandom
                     {
                         result.Numbers.Add(new Number(number));
                     }
-
+                    
                     Calculate.CalculateTickets(numbers, MyTickets);
 
                     result.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
                     DispatcherThread.Invoke(() =>
                     {
+                        result.Numbers.NotifyAll();
                         Results.Insert(0, result);
                     });
+                    ResultsCount = Results.Count;
                     count++;
+
                 }
 
                 foreach (var myTicket in MyTickets)
                 {
                     WonAmount += myTicket.WonAmount;
                 }
+                DispatcherThread.Invoke(() =>
+                {
+                    Results.NotifyAll();
+                });
+                timer.Stop();
                 SpendTime = DateTime.Now - startDate;
 
             }).Start();
@@ -258,6 +288,7 @@ namespace GreatRandom
         private int _ticketNumbers = 10;
         private TimeSpan _spendTime;
         private bool _isSystem;
+        private int _resultsCount;
 
         private void SelectNumber(object sender, RoutedEventArgs e)
         {
@@ -286,6 +317,8 @@ namespace GreatRandom
                     if (currentTicket.Numbers.Any(x => x.Value == rnd))
                         continue;
                     currentTicket.Numbers.Add(new Number((byte)rnd));
+                    currentTicket.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
+
                 }
             }
             if (IsSystem)

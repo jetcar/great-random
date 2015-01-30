@@ -54,6 +54,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Calculate.cs" />
+    <Compile Include="ObservableCollection.cs" />
     <Compile Include="SortableObservableCollection.cs" />
     <Compile Include="Ticket.cs" />
     <Page Include="MainWindow.xaml">

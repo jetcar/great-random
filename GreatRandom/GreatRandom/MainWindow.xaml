@@ -6,142 +6,150 @@
         Width="525"
         Height="650"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
-        <DockPanel>
+    <DockPanel>
 
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <StackPanel Orientation="Horizontal">
-
-
-                    <Button Margin="20"
-                            HorizontalAlignment="Left"
-                            Click="StartClick"
-                            Content="Start"
-                            FontSize="20"
-                            FontWeight="Bold"
-                            Padding="10" />
-                    <Label Content="{Binding SpendTime}" />
-                    <Button Margin="20"
-                            HorizontalAlignment="Left"
-                            Click="Reset_click"
-                            Content="Reset"
-                            FontSize="20"
-                            FontWeight="Bold"
-                            Padding="10" />
-                </StackPanel>
-                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                    <Button Click="numberOfGamesClick" Content="1" />
-                    <Button Click="numberOfGamesClick" Content="5" />
-                    <Button Click="numberOfGamesClick" Content="10" />
-                    <TextBox Width="50" Text="{Binding NumberOfGames, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                </StackPanel>
-                <StackPanel HorizontalAlignment="Right">
-                    <Label VerticalAlignment="Center" Content="{Binding SpendMoney}" />
-                    <Label VerticalAlignment="Center" Content="{Binding WonAmount}" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal">
 
 
-                </StackPanel>
-            </StackPanel>
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <Button Width="50"
-                        Height="30"
+                <Button Margin="20"
                         HorizontalAlignment="Left"
-                        Click="AddTicket"
-                        Content="Add" />
-                <TextBox Width="50" Text="{Binding TicketStake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Width="50" Text="{Binding TicketNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <ToggleButton Content="System" IsChecked="{Binding IsSystem}" />
+                        Click="StartClick"
+                        Content="Start"
+                        FontSize="20"
+                        FontWeight="Bold"
+                        Padding="10" />
+                <Label Content="{Binding SpendTime}" />
+                <Button Margin="20"
+                        HorizontalAlignment="Left"
+                        Click="Reset_click"
+                        Content="Reset"
+                        FontSize="20"
+                        FontWeight="Bold"
+                        Padding="10" />
+            </StackPanel>
+            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                <Button Click="numberOfGamesClick" Content="1" />
+                <Button Click="numberOfGamesClick" Content="5" />
+                <Button Click="numberOfGamesClick" Content="10" />
+                <TextBox Width="50" Text="{Binding NumberOfGames, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Right">
+                <Label VerticalAlignment="Center" Content="{Binding SpendMoney}" />
+                <Label VerticalAlignment="Center" Content="{Binding WonAmount}" />
+
 
             </StackPanel>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Width="50"
+                    Height="30"
+                    HorizontalAlignment="Left"
+                    Click="AddTicket"
+                    Content="Add" />
+            <TextBox Width="50" Text="{Binding TicketStake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Width="50" Text="{Binding TicketNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ToggleButton Content="System" IsChecked="{Binding IsSystem}" />
 
-            <ListView DockPanel.Dock="Top" ItemsSource="{Binding MyTickets}" Height="100">
-                <ListView.ItemTemplate>
-                    <DataTemplate DataType="greatRandom:Ticket">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <ItemsControl ItemsSource="{Binding Numbers}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Label Margin="5,0"
-                                                   Content="{Binding Value}"
-                                                   Foreground="Blue" />
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                    <Label Content="{Binding Numbers.Count}" />
-                                    <Label Content="{Binding WonAmount}" />
-                                    <TextBox Width="50" Text="{Binding Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </StackPanel>
-                                <Button Click="Remove_Ticket" Content="X" />
-                            </StackPanel>
-                            <ItemsControl ItemsSource="{Binding Results}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="greatRandom:Result">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Label Content="{Binding GameNumber}" />
-                                            <Label Content="{Binding WonNumbersAmount}" />
-                                            <Label Margin="0"
-                                                   Content="/"
-                                                   Padding="0" />
-                                            <Label Content="{Binding WonAmount}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <VirtualizingStackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+        </StackPanel>
 
-            <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Numbers}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="greatRandom:Number">
-                        <ToggleButton Height="20"
-                                      Click="SelectNumber"
-                                      Content="{Binding Value}"
-                                      IsChecked="{Binding IsChecked,
-                                                          Mode=TwoWay,
-                                                          UpdateSourceTrigger=PropertyChanged}" />
-
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="8" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-            <ListView DockPanel.Dock="Top" ItemsSource="{Binding Results}">
-                <ListView.ItemTemplate>
-                    <DataTemplate DataType="greatRandom:Ticket">
+        <ListView Height="100"
+                  DockPanel.Dock="Top"
+                  ItemsSource="{Binding MyTickets}">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="greatRandom:Ticket">
+                    <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <ItemsControl ItemsSource="{Binding Numbers}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Label Margin="0,0,3,0" Content="{Binding Value}" />
+                                        <Label Margin="5,0"
+                                               Content="{Binding Value}"
+                                               Foreground="Blue" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <VirtualizingStackPanel Orientation="Horizontal" />
+                                        <StackPanel Orientation="Horizontal" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-
+                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                <Label Content="{Binding Numbers.Count}" />
+                                <Label Content="{Binding WonAmount}" />
+                                <TextBox Width="50" Text="{Binding Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <Button Click="Remove_Ticket" Content="X" />
                         </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                        <ItemsControl ItemsSource="{Binding Results}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="greatRandom:Result">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="{Binding GameNumber}" />
+                                        <Label Content="{Binding WonNumbersAmount}" />
+                                        <Label Margin="0"
+                                               Content="/"
+                                               Padding="0" />
+                                        <Label Content="{Binding WonAmount}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
-        </DockPanel>
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Numbers}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="greatRandom:Number">
+                    <ToggleButton Height="20"
+                                  Click="SelectNumber"
+                                  Content="{Binding Value}"
+                                  IsChecked="{Binding IsChecked,
+                                                      Mode=TwoWay,
+                                                      UpdateSourceTrigger=PropertyChanged}" />
+
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="8" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <Label DockPanel.Dock="Top" HorizontalAlignment="Right" Content="{Binding ResultsCount}"></Label>
+        <ListView DockPanel.Dock="Top" ItemsSource="{Binding Results}">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="greatRandom:Ticket">
+                    <StackPanel Orientation="Horizontal">
+                        <ItemsControl ItemsSource="{Binding Numbers}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Margin="0,0,3,0" Content="{Binding Value}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
+
+    </DockPanel>
 </Window>
