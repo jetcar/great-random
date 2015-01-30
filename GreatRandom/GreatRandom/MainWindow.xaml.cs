@@ -156,6 +156,17 @@ namespace GreatRandom
             }
         }
 
+        public bool IsSystem
+        {
+            get { return _isSystem; }
+            set
+            {
+                if (value.Equals(_isSystem)) return;
+                _isSystem = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -201,7 +212,7 @@ namespace GreatRandom
                     result.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
                     DispatcherThread.Invoke(() =>
                     {
-                        Results.Insert(0,result);
+                        Results.Insert(0, result);
                     });
                     count++;
                 }
@@ -246,6 +257,7 @@ namespace GreatRandom
         private double _ticketStake = 1;
         private int _ticketNumbers = 10;
         private TimeSpan _spendTime;
+        private bool _isSystem;
 
         private void SelectNumber(object sender, RoutedEventArgs e)
         {
@@ -257,7 +269,7 @@ namespace GreatRandom
             }
             else
             {
-                currentTicket.Numbers.Remove(currentTicket.Numbers.First(x=>x.Value == number.Value));
+                currentTicket.Numbers.Remove(currentTicket.Numbers.First(x => x.Value == number.Value));
             }
             currentTicket.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
 
@@ -276,10 +288,29 @@ namespace GreatRandom
                     currentTicket.Numbers.Add(new Number((byte)rnd));
                 }
             }
+            if (IsSystem)
+            {
+                var array = Numbers.Where(x => x.IsChecked).Select(x => x.Value).ToArray();
+                currentTicket.Numbers.Clear();
+                var combinations = GenerateAllPermutations(array, TicketNumbers);
+                foreach (var comb in combinations)
+                {
+                    foreach (var number in comb)
+                    {
+                        currentTicket.Numbers.Add(new Number(number));
+                    }
+                    currentTicket.Amount = TicketStake;
+                    MyTickets.Add(currentTicket);
+                    currentTicket = new Ticket();
+                }
 
+            }
+            else
+            {
+                currentTicket.Amount = TicketStake;
+                MyTickets.Add(currentTicket);
 
-            currentTicket.Amount = TicketStake;
-            MyTickets.Add(currentTicket);
+            }
             foreach (var number in Numbers)
             {
                 number.IsChecked = false;
@@ -287,6 +318,19 @@ namespace GreatRandom
             currentTicket = new Ticket();
             TicketStake = 1;
         }
+
+        public static IEnumerable<T[]> GenerateAllPermutations<T>(T[] source, int count) where T : IComparable
+        {
+            return GetKCombs(source, count).Select(x => x.ToArray());
+        }
+        static IEnumerable<IEnumerable<T>> GetKCombs<T>(IEnumerable<T> list, int length) where T : IComparable
+        {
+            if (length == 1) return list.Select(t => new T[] { t });
+            return GetKCombs(list, length - 1)
+                .SelectMany(t => list.Where(o => o.CompareTo(t.Last()) > 0),
+                    (t1, t2) => t1.Concat(new T[] { t2 }));
+        }
+
 
         private void numberOfGamesClick(object sender, RoutedEventArgs e)
         {

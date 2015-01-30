@@ -6,7 +6,6 @@
         Width="525"
         Height="650"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    <ScrollViewer>
         <DockPanel>
 
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
@@ -20,7 +19,7 @@
                             FontSize="20"
                             FontWeight="Bold"
                             Padding="10" />
-                    <Label Content="{Binding SpendTime}"></Label>
+                    <Label Content="{Binding SpendTime}" />
                     <Button Margin="20"
                             HorizontalAlignment="Left"
                             Click="Reset_click"
@@ -50,10 +49,11 @@
                         Content="Add" />
                 <TextBox Width="50" Text="{Binding TicketStake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBox Width="50" Text="{Binding TicketNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ToggleButton Content="System" IsChecked="{Binding IsSystem}" />
 
             </StackPanel>
 
-            <ListView DockPanel.Dock="Top" ItemsSource="{Binding MyTickets}">
+            <ListView DockPanel.Dock="Top" ItemsSource="{Binding MyTickets}" Height="100">
                 <ListView.ItemTemplate>
                     <DataTemplate DataType="greatRandom:Ticket">
                         <StackPanel>
@@ -106,8 +106,7 @@
             <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Numbers}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="greatRandom:Number">
-                        <ToggleButton 
-                                      Height="20"
+                        <ToggleButton Height="20"
                                       Click="SelectNumber"
                                       Content="{Binding Value}"
                                       IsChecked="{Binding IsChecked,
@@ -118,7 +117,7 @@
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Columns="8"  />
+                        <UniformGrid Columns="8" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
@@ -145,5 +144,4 @@
             </ListView>
 
         </DockPanel>
-    </ScrollViewer>
 </Window>
