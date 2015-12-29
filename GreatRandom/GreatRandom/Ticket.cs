@@ -7,53 +7,44 @@ using GreatRandom.Annotations;
 
 namespace GreatRandom
 {
-    public class Ticket : INotifyPropertyChanged
+    public class Ticket
     {
-        private SortableObservableCollection<Number> _numbers = new SortableObservableCollection<Number>();
-        private double _amount = 1;
-        private double _wonAmount;
-        private SortableObservableCollection<Result> _results = new SortableObservableCollection<Result>();
-        public event PropertyChangedEventHandler PropertyChanged;
+        private HashSet<byte> _numbers;
+        private int _stake = 1;
+        private int _wonAmount;
 
-        public SortableObservableCollection<Number> Numbers
+        public Ticket()
+        {
+            _numbers = new HashSet<byte>();
+        }
+
+        public HashSet<byte> Numbers
         {
             get { return _numbers; }
             set { _numbers = value; }
         }
 
-        public double WonAmount
+        public int WonAmount
         {
             get { return _wonAmount; }
             set
             {
                 if (value.Equals(_wonAmount)) return;
                 _wonAmount = value;
-                OnPropertyChanged();
             }
         }
 
-        public double Amount
+        public int Stake
         {
-            get { return _amount; }
+            get { return _stake; }
             set
             {
-                if (value.Equals(_amount)) return;
-                _amount = value;
-                OnPropertyChanged();
+                if (value.Equals(_stake)) return;
+                _stake = value;
             }
         }
 
-        public SortableObservableCollection<Result> Results
-        {
-            get { return _results; }
-            set { _results = value; }
-        }
+        public bool IsWon { get; set; }
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

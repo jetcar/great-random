@@ -10,20 +10,20 @@ namespace GreatRandom
     public class Calculate
     {
 
-        public static double CalculateTickets(HashSet<byte> numbers, SortableObservableCollection<Ticket> myTickets)
+        public static int CalculateTickets(HashSet<byte> numbers, IList<Ticket> myTickets)
         {
+            int TotalWon = 0;
             foreach (var myTicket in myTickets)
             {
                 var wonNumbersAmount = 0;
                 foreach (var number in myTicket.Numbers)
                 {
-                    if (numbers.Contains(number.Value))
+                    if (numbers.Contains(number))
                     {
                         wonNumbersAmount++;
-                        number.IsChecked = true;
                     }
                 }
-                double wonAmount = 0;
+                int wonAmount = 0;
                 switch (myTicket.Numbers.Count)
                 {
                     case 1:
@@ -43,8 +43,7 @@ namespace GreatRandom
                             case 1:
                                 break;
                             case 2:
-                                wonAmount = myTicket.Amount * 5;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 5;
                                 break;
                         }
 
@@ -57,11 +56,10 @@ namespace GreatRandom
                             case 1:
                                 break;
                             case 2:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 3:
-                                wonAmount = myTicket.Amount * 11;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 11;
                                 break;
                         }
                         break;
@@ -69,18 +67,17 @@ namespace GreatRandom
                         switch (wonNumbersAmount)
                         {
                             case 0:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 1:
                                 break;
                             case 2:
                                 break;
                             case 3:
-                                wonAmount = myTicket.Amount * 2;
+                                wonAmount = myTicket.Stake * 2;
                                 break;
                             case 4:
-                                wonAmount = myTicket.Amount * 20;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 20;
                                 break;
                         }
                         break;
@@ -88,21 +85,20 @@ namespace GreatRandom
                         switch (wonNumbersAmount)
                         {
                             case 0:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 1:
                                 break;
                             case 2:
                                 break;
                             case 3:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 4:
-                                wonAmount = myTicket.Amount * 4;
+                                wonAmount = myTicket.Stake * 4;
                                 break;
                             case 5:
-                                wonAmount = myTicket.Amount * 50;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 50;
                                 break;
                         }
                         break;
@@ -110,7 +106,7 @@ namespace GreatRandom
                         switch (wonNumbersAmount)
                         {
                             case 0:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 1:
                                 break;
@@ -119,14 +115,13 @@ namespace GreatRandom
                             case 3:
                                 break;
                             case 4:
-                                wonAmount = myTicket.Amount * 2;
+                                wonAmount = myTicket.Stake * 2;
                                 break;
                             case 5:
-                                wonAmount = myTicket.Amount * 20;
+                                wonAmount = myTicket.Stake * 20;
                                 break;
                             case 6:
-                                wonAmount = myTicket.Amount * 200;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 200;
                                 break;
                         }
                         break;
@@ -134,7 +129,7 @@ namespace GreatRandom
                         switch (wonNumbersAmount)
                         {
                             case 0:
-                                wonAmount = myTicket.Amount * 2;
+                                wonAmount = myTicket.Stake * 2;
                                 break;
                             case 1:
                                 break;
@@ -143,17 +138,16 @@ namespace GreatRandom
                             case 3:
                                 break;
                             case 4:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 5:
-                                wonAmount = myTicket.Amount * 4;
+                                wonAmount = myTicket.Stake * 4;
                                 break;
                             case 6:
-                                wonAmount = myTicket.Amount * 40;
+                                wonAmount = myTicket.Stake * 40;
                                 break;
                             case 7:
-                                wonAmount = myTicket.Amount * 600;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 600;
                                 break;
                         }
                         break;
@@ -161,7 +155,7 @@ namespace GreatRandom
                         switch (wonNumbersAmount)
                         {
                             case 0:
-                                wonAmount = myTicket.Amount * 2;
+                                wonAmount = myTicket.Stake * 2;
                                 break;
                             case 1:
                                 break;
@@ -170,20 +164,19 @@ namespace GreatRandom
                             case 3:
                                 break;
                             case 4:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 5:
-                                wonAmount = myTicket.Amount * 2;
+                                wonAmount = myTicket.Stake * 2;
                                 break;
                             case 6:
-                                wonAmount = myTicket.Amount * 10;
+                                wonAmount = myTicket.Stake * 10;
                                 break;
                             case 7:
-                                wonAmount = myTicket.Amount * 100;
+                                wonAmount = myTicket.Stake * 100;
                                 break;
                             case 8:
-                                wonAmount = myTicket.Amount * 2000;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 2000;
                                 break;
                         }
                         break;
@@ -191,7 +184,7 @@ namespace GreatRandom
                         switch (wonNumbersAmount)
                         {
                             case 0:
-                                wonAmount = myTicket.Amount * 3;
+                                wonAmount = myTicket.Stake * 3;
                                 break;
                             case 1:
                                 break;
@@ -202,20 +195,19 @@ namespace GreatRandom
                             case 4:
                                 break;
                             case 5:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 6:
-                                wonAmount = myTicket.Amount * 5;
+                                wonAmount = myTicket.Stake * 5;
                                 break;
                             case 7:
-                                wonAmount = myTicket.Amount * 50;
+                                wonAmount = myTicket.Stake * 50;
                                 break;
                             case 8:
-                                wonAmount = myTicket.Amount * 400;
+                                wonAmount = myTicket.Stake * 400;
                                 break;
                             case 9:
-                                wonAmount = myTicket.Amount * 7000;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 7000;
                                 break;
                         }
                         break;
@@ -223,7 +215,7 @@ namespace GreatRandom
                         switch (wonNumbersAmount)
                         {
                             case 0:
-                                wonAmount = myTicket.Amount * 3;
+                                wonAmount = myTicket.Stake * 3;
                                 break;
                             case 1:
                                 break;
@@ -234,51 +226,31 @@ namespace GreatRandom
                             case 4:
                                 break;
                             case 5:
-                                wonAmount = myTicket.Amount * 1;
+                                wonAmount = myTicket.Stake * 1;
                                 break;
                             case 6:
-                                wonAmount = myTicket.Amount * 2;
+                                wonAmount = myTicket.Stake * 2;
                                 break;
                             case 7:
-                                wonAmount = myTicket.Amount * 10;
+                                wonAmount = myTicket.Stake * 10;
                                 break;
                             case 8:
-                                wonAmount = myTicket.Amount * 140;
+                                wonAmount = myTicket.Stake * 140;
                                 break;
                             case 9:
-                                wonAmount = myTicket.Amount * 1400;
+                                wonAmount = myTicket.Stake * 1400;
                                 break;
                             case 10:
-                                wonAmount = myTicket.Amount * 20000;
-                                return wonAmount;
+                                wonAmount = myTicket.Stake * 20000;
                                 break;
                         }
                         break;
                 }
-                myTicket.WonAmount += wonAmount;
-                var results = myTicket.Results;
-                MainWindow.DispatcherThread.Invoke(() =>
-                {
-                    results.Add(new Result(results.Count + 1, wonNumbersAmount, wonAmount));
-                    results.Sort(x => x.GameNumber, ListSortDirection.Descending);
-                });
+                myTicket.IsWon = wonAmount > myTicket.Stake;
+                TotalWon += wonAmount;
             }
-            return 0;
+            return TotalWon;
         }
     }
 
-    public class Result
-    {
-        public Result(int index,int wonNumbersAmount, double wonAmount)
-        {
-            GameNumber = index;
-            WonAmount = wonAmount;
-            WonNumbersAmount = wonNumbersAmount;
-        }
-
-        public int GameNumber { get; set; }
-        public int WonNumbersAmount { get; set; }
-
-        public double WonAmount { get; set; }
-    }
 }

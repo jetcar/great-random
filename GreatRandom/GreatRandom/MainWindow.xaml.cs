@@ -4,21 +4,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using GreatRandom.Annotations;
 
 namespace GreatRandom
@@ -28,69 +15,271 @@ namespace GreatRandom
     /// </summary>
     public partial class MainWindow : INotifyPropertyChanged
     {
-        private SortableObservableCollection<Number> _numbersCollection = new SortableObservableCollection<Number>();
-        private IDictionary<int, Number> _numbersDict = new Dictionary<int, Number>();
-        private byte amount = 64;
-        private SortableObservableCollection<Ticket> _myTickets = new SortableObservableCollection<Ticket>();
-        public static Dispatcher DispatcherThread;
-        public DispatcherTimer timer = new DispatcherTimer();
+        public static byte MAXNUMBER = 64;
+        private static Random random = new Random();
+        private int _numberOfGames = 0;
+        private readonly Calculate _calculate;
+        private ObservableCollection<Player> _players = new ObservableCollection<Player>();
+        private int _gamesPlayed;
+        private int _playerCounter = 1;
+        private SortableObservableCollection<Player> _topPlayers = new SortableObservableCollection<Player>();
+        private IDictionary<int, NumberStat> numberStatDict = new Dictionary<int, NumberStat>();
+        private ObservableCollection<NumberStat> _numbersStatistic = new ObservableCollection<NumberStat>();
+        private int intStatisticIterations = 100;
+        private string _statisticIterations = "100";
+
         public MainWindow()
         {
-            for (byte i = 0; i < amount; i++)
-            {
-                var number = new Number((byte)(i + 1));
-                Numbers.Add(number);
-                _numbersDict.Add(i + 1, number);
-            }
-            timer.Interval = new TimeSpan(0,0,0,0,100);
-            timer.Tick += timer_Tick;
+            _calculate = new Calculate();
             InitializeComponent();
-            DispatcherThread = Dispatcher.CurrentDispatcher;
+            this.Loaded += MainWindow_Loaded;
+            for (int i = 1; i <= MAXNUMBER; i++)
+            {
+                var numberstat = new NumberStat() { Number = i };
+                numberStatDict[i] = numberstat;
+                _numbersStatistic.Add(numberstat);
+            }
+
         }
 
-        void timer_Tick(object sender, EventArgs e)
+        void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            Results.NotifyAll();
+            for (int i = 0; i < 100; i++)
+            {
+                var playernew = CreatePlayer(PlayerCounter++);
+                Dispatcher.Invoke(() =>
+                {
+                    Players.Add(playernew);
+
+                });
+            }
+            var thread = new Thread(ProcessGames);
+            thread.Start();
+
         }
 
 
-        public SortableObservableCollection<Number> Numbers
+
+        public void ProcessGames()
         {
-            get { return _numbersCollection; }
-            set { _numbersCollection = value; }
+            int counter = PlayerCounter;
+            while (true)
+            {
+                var numbers = new HashSet<byte>();
+                int randomNumber = 0;
+                while (numbers.Count < 20)
+                {
+                    randomNumber = random.Next(MAXNUMBER);
+
+                    var value = (byte)(randomNumber % MAXNUMBER + 1);
+                    if (numbers.Contains(value))
+                        continue;
+                    numbers.Add(value);
+                }
+                foreach (var number in numbers)
+                {
+                    numberStatDict[number].TimesAppear++;
+                }
+
+                for (int i = 0; i < Players.Count; i++)
+                {
+                    var player = Players[i];
+                    GenerateNumbersBuyTickets(player);
+                    var moneyWon = Calculate.CalculateTickets(numbers, player.Tickets);
+                    if (moneyWon > 1000)
+                    {
+                        var childsAmount = moneyWon / 1000;
+                        for (int j = 0; j < childsAmount; j++)
+                        {
+                            var child = new Player(player.NumbersAmount, (counter++).ToString(), player.NumberOfTickets, player.Stake, player.SameNumbers, 1000, player.System);
+                            Dispatcher.Invoke(() =>
+                            {
+                                Players.Add(child);
+                            });
+                        }
+                    }
+                    player.Money += moneyWon;
+                    counter = RenewPlayer(player, counter);
+                    player.GamesPlayed++;
+                }
+
+                while (Players.Count < 100)
+                {
+                    var player = CreatePlayer(counter++);
+                    Dispatcher.Invoke(() =>
+                    {
+                        Players.Add(player);
+                    });
+                }
+
+                PlayerCounter = Players.Count;
+                GamesPlayed++;
+            }
         }
 
-
-
-        public int NumberOfGames
+        private int RenewPlayer(Player player, int counter)
         {
-            get { return _numberOfGames; }
+            if (player.Money < 0)
+            {
+                Dispatcher.Invoke(() => { Players.Remove(player); });
+                var minSpendMoney = 0;
+                var lastPlayer = TopPlayers.LastOrDefault();
+                if (lastPlayer != null)
+                {
+                    minSpendMoney = lastPlayer.SpendMoney;
+                }
+                if (player.SpendMoney > minSpendMoney)
+                {
+                    Dispatcher.Invoke(() => { TopPlayers.Add(player); });
+
+                }
+                Dispatcher.Invoke(() =>
+                {
+                    TopPlayers.Sort(x => x.SpendMoney, ListSortDirection.Descending);
+                    while (TopPlayers.Count > 10)
+                    {
+                        TopPlayers.RemoveAt(TopPlayers.Count - 1);
+                    }
+                });
+
+
+            }
+            return counter;
+        }
+
+        public static void GenerateNumbersBuyTickets(Player player)
+        {
+            if (player.System != player.NumbersAmount)
+            {
+                if (!player.SameNumbers || player.Tickets.Count == 0)
+                {
+                    var array = GenerateRandomsArray(player.NumbersAmount).ToArray();
+
+                    var combinations = GenerateAllPermutations(array, player.System).ToArray();
+                    player.Tickets.Clear();
+                    ;
+                    foreach (var comb in combinations)
+                    {
+                        var currentTicket = new Ticket();
+                        for (int index = 0; index < comb.Length; index++)
+                        {
+                            currentTicket.Numbers.Add(comb[index]);
+                        }
+                        currentTicket.Stake = player.Stake;
+                        player.Tickets.Add(currentTicket);
+                    }
+                }
+            }
+            else
+            {
+                while (player.Tickets.Count < player.NumberOfTickets)
+                {
+                    var ticket = new Ticket();
+                    ticket.Numbers = GenerateRandomsArray(player.System);
+                    player.Tickets.Add(ticket);
+                }
+                for (int j = 0; j < player.Tickets.Count; j++)
+                {
+                    var currentTicket = player.Tickets[j];
+                    if (!player.SameNumbers || currentTicket.IsWon)
+                    {
+                        currentTicket.Numbers = GenerateRandomsArray(player.System);
+                    }
+                    currentTicket.Stake = player.Stake;
+
+                }
+            }
+
+            foreach (var ticket in player.Tickets)
+            {
+                player.Money -= ticket.Stake;
+                player.SpendMoney += ticket.Stake;
+                if (player.Money < 0)
+                    ticket.Stake = 0;
+            }
+        }
+
+        public static long Combinations(int n, int k)
+        {
+            return Factorial(n) / (Factorial(k) * Factorial(n - k));
+        }
+
+        public static long Factorial(int n)
+        {
+            long result = 1;
+            for (int i = n; i > 0; i--)
+            {
+                result *= i;
+            }
+            return result;
+        }
+
+        public Player CreatePlayer(int counter)
+        {
+            var numbersAmount = 0;
+            var system = 0;
+            long combinations = 0;
+            var stake = random.Next(1, 15 + 1);
+            var Money = 1000;
+            long ticketsAmount = 0;
+            while (ticketsAmount < 10)
+            {
+                do
+                {
+                    numbersAmount = random.Next(1, 15 + 1);
+                    system = random.Next(1, numbersAmount + 1);
+                    while (system > 10)
+                    {
+                        system = random.Next(1, numbersAmount + 1);
+                    }
+                    combinations = Combinations(numbersAmount, system);
+
+                } while (combinations*stake > Money || combinations > 50);
+                ticketsAmount = combinations;
+                while (ticketsAmount*stake > Money || ticketsAmount == 0)
+                {
+                    ticketsAmount = random.Next(1, Money/stake + 1);
+                }
+            }
+            var playernew = new Player(numbersAmount, counter++.ToString(), (int)ticketsAmount, stake, random.Next(0, 2) == 1, Money, system);
+
+
+            return playernew;
+        }
+
+        public static HashSet<byte> GenerateRandomsArray(int numbers)
+        {
+            var array = new HashSet<byte>();
+            int k = 0;
+            while (k < numbers)
+            {
+                var rnd = random.Next(1, MAXNUMBER + 1);
+                if (array.Any(x => x == rnd))
+                    continue;
+                array.Add((byte)rnd);
+                k++;
+            }
+            return array;
+        }
+
+        public ObservableCollection<NumberStat> NumbersStatistic
+        {
+            get { return _numbersStatistic; }
             set
             {
-                if (value == _numberOfGames) return;
-                _numberOfGames = value;
+                if (Equals(value, _numbersStatistic)) return;
+                _numbersStatistic = value;
                 OnPropertyChanged();
             }
         }
 
-        public double SpendMoney
+        public int PlayerCounter
         {
-            get { return _spendMoney; }
+            get { return _playerCounter; }
             set
             {
-                if (value.Equals(_spendMoney)) return;
-                _spendMoney = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public double WonAmount
-        {
-            get { return _wonAmount; }
-            set
-            {
-                if (value.Equals(_wonAmount)) return;
-                _wonAmount = value;
+                if (value == _playerCounter) return;
+                _playerCounter = value;
                 OnPropertyChanged();
             }
         }
@@ -106,22 +295,35 @@ namespace GreatRandom
             }
         }
 
-        public SortableObservableCollection<Ticket> Results
+        public SortableObservableCollection<Player> TopPlayers
         {
-            get { return _results; }
+            get { return _topPlayers; }
             set
             {
-                _results = value;
+                if (Equals(value, _topPlayers)) return;
+                _topPlayers = value;
                 OnPropertyChanged();
             }
         }
 
-        public SortableObservableCollection<Ticket> MyTickets
+        public ObservableCollection<Player> Players
         {
-            get { return _myTickets; }
+            get { return _players; }
             set
             {
-                _myTickets = value;
+                if (Equals(value, _players)) return;
+                _players = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string StatisticIterations
+        {
+            get { return _statisticIterations; }
+            set
+            {
+                if (value == _statisticIterations) return;
+                _statisticIterations = value;
                 OnPropertyChanged();
             }
         }
@@ -131,60 +333,6 @@ namespace GreatRandom
             get { return _calculate; }
         }
 
-        public double TicketStake
-        {
-            get { return _ticketStake; }
-            set
-            {
-                if (value.Equals(_ticketStake)) return;
-                _ticketStake = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int TicketNumbers
-        {
-            get { return _ticketNumbers; }
-            set
-            {
-                if (value == _ticketNumbers) return;
-                _ticketNumbers = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public TimeSpan SpendTime
-        {
-            get { return _spendTime; }
-            set
-            {
-                if (value.Equals(_spendTime)) return;
-                _spendTime = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsSystem
-        {
-            get { return _isSystem; }
-            set
-            {
-                if (value.Equals(_isSystem)) return;
-                _isSystem = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int ResultsCount
-        {
-            get { return _resultsCount; }
-            set
-            {
-                if (value == _resultsCount) return;
-                _resultsCount = value;
-                OnPropertyChanged();
-            }
-        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -195,164 +343,8 @@ namespace GreatRandom
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
-        private void StartClick(object sender, RoutedEventArgs e)
-        {
-            timer.Start();
-            new Thread(() =>
-            {
-                var startDate = DateTime.Now;
-
-                byte[] randomNumber = new byte[1];
-                WonAmount = 0;
-                foreach (var myTicket in MyTickets)
-                {
-                    SpendMoney += NumberOfGames * myTicket.Amount;
-                }
-                var count = 0;
-                while (count < NumberOfGames)
-                {
-
-                    var numbers = new HashSet<byte>();
-                    while (numbers.Count < 20)
-                    {
-                        rngCsp.GetBytes(randomNumber);
-
-                        var value = (byte)(randomNumber[0] % amount + 1);
-                        if (numbers.Contains(value))
-                            continue;
-                        numbers.Add(value);
-                    }
-                    var result = new Ticket();
-                    foreach (var number in numbers)
-                    {
-                        result.Numbers.Add(new Number(number));
-                    }
-                    
-                    Calculate.CalculateTickets(numbers, MyTickets);
-
-                    result.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
-                    DispatcherThread.Invoke(() =>
-                    {
-                        result.Numbers.NotifyAll();
-                        Results.Insert(0, result);
-                    });
-                    ResultsCount = Results.Count;
-                    count++;
-
-                }
-
-                foreach (var myTicket in MyTickets)
-                {
-                    WonAmount += myTicket.WonAmount;
-                }
-                DispatcherThread.Invoke(() =>
-                {
-                    Results.NotifyAll();
-                });
-                timer.Stop();
-                SpendTime = DateTime.Now - startDate;
-
-            }).Start();
-
-        }
 
 
-        private void Reset_click(object sender, RoutedEventArgs e)
-        {
-            foreach (var numberStatistic in Numbers)
-            {
-                numberStatistic.IsChecked = true;
-            }
-            SpendMoney = 0;
-            Results = new SortableObservableCollection<Ticket>();
-            foreach (var number in Numbers)
-            {
-                number.IsChecked = false;
-            }
-            MyTickets = new SortableObservableCollection<Ticket>();
-            currentTicket = new Ticket();
-            WonAmount = 0;
-            GamesPlayed = 0;
-            NumberOfGames = 1;
-        }
-
-        Ticket currentTicket = new Ticket();
-        private SortableObservableCollection<Ticket> _results = new SortableObservableCollection<Ticket>();
-        private double _spendMoney;
-        private double _wonAmount;
-        private int _gamesPlayed;
-        private int _numberOfGames = 1;
-        private readonly Calculate _calculate;
-        private double _ticketStake = 1;
-        private int _ticketNumbers = 10;
-        private TimeSpan _spendTime;
-        private bool _isSystem;
-        private int _resultsCount;
-
-        private void SelectNumber(object sender, RoutedEventArgs e)
-        {
-            var toggleButton = sender as ToggleButton;
-            var number = toggleButton.DataContext as Number;
-            if (number.IsChecked)
-            {
-                currentTicket.Numbers.Add(new Number(number.Value));
-            }
-            else
-            {
-                currentTicket.Numbers.Remove(currentTicket.Numbers.First(x => x.Value == number.Value));
-            }
-            currentTicket.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
-
-        }
-
-        private void AddTicket(object sender, RoutedEventArgs e)
-        {
-            if (currentTicket.Numbers.Count == 0)
-            {
-                var random = new Random();
-                while (currentTicket.Numbers.Count < TicketNumbers)
-                {
-                    var rnd = random.Next(1, amount + 1);
-                    if (currentTicket.Numbers.Any(x => x.Value == rnd))
-                        continue;
-                    currentTicket.Numbers.Add(new Number((byte)rnd));
-                    currentTicket.Numbers.Sort(x => x.Value, ListSortDirection.Ascending);
-
-                }
-            }
-            if (IsSystem)
-            {
-                var array = Numbers.Where(x => x.IsChecked).Select(x => x.Value).ToArray();
-                currentTicket.Numbers.Clear();
-                var combinations = GenerateAllPermutations(array, TicketNumbers);
-                foreach (var comb in combinations)
-                {
-                    foreach (var number in comb)
-                    {
-                        currentTicket.Numbers.Add(new Number(number));
-                    }
-                    currentTicket.Amount = TicketStake;
-                    MyTickets.Add(currentTicket);
-                    currentTicket = new Ticket();
-                }
-
-            }
-
-
-            else
-            {
-                currentTicket.Amount = TicketStake;
-                MyTickets.Add(currentTicket);
-
-            }
-            foreach (var number in Numbers)
-            {
-                number.IsChecked = false;
-            }
-            currentTicket = new Ticket();
-            TicketStake = 1;
-        }
 
         public static IEnumerable<T[]> GenerateAllPermutations<T>(T[] source, int count) where T : IComparable
         {
@@ -367,16 +359,9 @@ namespace GreatRandom
         }
 
 
-        private void numberOfGamesClick(object sender, RoutedEventArgs e)
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            NumberOfGames = Convert.ToInt32(((Button)sender).Content);
-        }
-
-        private void Remove_Ticket(object sender, RoutedEventArgs e)
-        {
-            var button = sender as Button;
-            var ticket = button.DataContext as Ticket;
-            MyTickets.Remove(ticket);
+            intStatisticIterations = Convert.ToInt32(StatisticIterations);
         }
     }
 }

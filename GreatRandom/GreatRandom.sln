@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreatRandom", "GreatRandom\GreatRandom.csproj", "{DD0AC957-593E-42A1-9B8F-D5AA0E2CBF64}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject1", "UnitTestProject1\UnitTestProject1.csproj", "{A4D5AFEB-227E-4497-A160-EEDD401C3201}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DD0AC957-593E-42A1-9B8F-D5AA0E2CBF64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD0AC957-593E-42A1-9B8F-D5AA0E2CBF64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD0AC957-593E-42A1-9B8F-D5AA0E2CBF64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4D5AFEB-227E-4497-A160-EEDD401C3201}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4D5AFEB-227E-4497-A160-EEDD401C3201}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4D5AFEB-227E-4497-A160-EEDD401C3201}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4D5AFEB-227E-4497-A160-EEDD401C3201}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

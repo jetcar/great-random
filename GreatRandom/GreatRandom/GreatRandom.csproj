@@ -54,7 +54,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Calculate.cs" />
-    <Compile Include="ObservableCollection.cs" />
+    <Compile Include="NumberStat.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="SortableObservableCollection.cs" />
     <Compile Include="Ticket.cs" />
     <Page Include="MainWindow.xaml">
@@ -71,7 +72,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Number.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

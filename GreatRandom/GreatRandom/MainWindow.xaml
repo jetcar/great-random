@@ -3,145 +3,102 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:greatRandom="clr-namespace:GreatRandom"
         Title="MainWindow"
-        Width="525"
+        Width="725"
         Height="650"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    <DockPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <StackPanel Orientation="Horizontal">
-
-
-                <Button Margin="20"
-                        HorizontalAlignment="Left"
-                        Click="StartClick"
-                        Content="Start"
-                        FontSize="20"
-                        FontWeight="Bold"
-                        Padding="10" />
-                <Label Content="{Binding SpendTime}" />
-                <Button Margin="20"
-                        HorizontalAlignment="Left"
-                        Click="Reset_click"
-                        Content="Reset"
-                        FontSize="20"
-                        FontWeight="Bold"
-                        Padding="10" />
-            </StackPanel>
-            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                <Button Click="numberOfGamesClick" Content="1" />
-                <Button Click="numberOfGamesClick" Content="5" />
-                <Button Click="numberOfGamesClick" Content="10" />
-                <TextBox Width="50" Text="{Binding NumberOfGames, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Right">
-                <Label VerticalAlignment="Center" Content="{Binding SpendMoney}" />
-                <Label VerticalAlignment="Center" Content="{Binding WonAmount}" />
-
-
-            </StackPanel>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Label Content="games played:" />
+            <Label Content="{Binding GamesPlayed}" />
+            <Label Content="players:" />
+            <Label Content="{Binding PlayerCounter}" />
         </StackPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button Width="50"
-                    Height="30"
-                    HorizontalAlignment="Left"
-                    Click="AddTicket"
-                    Content="Add" />
-            <TextBox Width="50" Text="{Binding TicketStake, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBox Width="50" Text="{Binding TicketNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <ToggleButton Content="System" IsChecked="{Binding IsSystem}" />
-
+        <StackPanel Grid.Row="0" Grid.Column="1">
+            <TextBox Width="100" Text="{Binding StatisticIterations}" />
+            <Button Click="ButtonBase_OnClick">ok</Button>
         </StackPanel>
-
-        <ListView Height="100"
-                  DockPanel.Dock="Top"
-                  ItemsSource="{Binding MyTickets}">
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="Name" />
+            <Label Grid.Column="1" Content="Money" />
+            <Label Grid.Column="2" Content="Games" />
+            <Label Grid.Column="3" Content="Stake" />
+            <Label Grid.Column="4" Content="Tickets" />
+            <Label Grid.Column="5" Content="Numbers" />
+            <Label Grid.Column="6" Content="SameNumbers" />
+            <Label Grid.Column="7" Content="System" />
+        </Grid>
+        <ListView Grid.Row="1"
+                  Grid.RowSpan="3"
+                  Grid.Column="1"
+                  Width="150"
+                  HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding NumbersStatistic}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
-                <DataTemplate DataType="greatRandom:Ticket">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <ItemsControl ItemsSource="{Binding Numbers}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Label Margin="5,0"
-                                               Content="{Binding Value}"
-                                               Foreground="Blue" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                <Label Content="{Binding Numbers.Count}" />
-                                <Label Content="{Binding WonAmount}" />
-                                <TextBox Width="50" Text="{Binding Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <Button Click="Remove_Ticket" Content="X" />
-                        </StackPanel>
-                        <ItemsControl ItemsSource="{Binding Results}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="greatRandom:Result">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="{Binding GameNumber}" />
-                                        <Label Content="{Binding WonNumbersAmount}" />
-                                        <Label Margin="0"
-                                               Content="/"
-                                               Padding="0" />
-                                        <Label Content="{Binding WonAmount}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
+                <DataTemplate DataType="greatRandom:NumberStat">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{Binding Number}" />
+                        <Label Content="{Binding TimesAppear}" />
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
+
         </ListView>
-
-        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Numbers}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="greatRandom:Number">
-                    <ToggleButton Height="20"
-                                  Click="SelectNumber"
-                                  Content="{Binding Value}"
-                                  IsChecked="{Binding IsChecked,
-                                                      Mode=TwoWay,
-                                                      UpdateSourceTrigger=PropertyChanged}" />
-
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <UniformGrid Columns="8" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-        </ItemsControl>
-        <Label DockPanel.Dock="Top" HorizontalAlignment="Right" Content="{Binding ResultsCount}"></Label>
-        <ListView DockPanel.Dock="Top" ItemsSource="{Binding Results}">
+        <ListView Grid.Row="2"
+                  HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding Players}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
-                <DataTemplate DataType="greatRandom:Ticket">
-                    <StackPanel Orientation="Horizontal">
-                        <ItemsControl ItemsSource="{Binding Numbers}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Label Margin="0,0,3,0" Content="{Binding Value}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-
-                    </StackPanel>
+                <DataTemplate DataType="greatRandom:Player">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="{Binding Name}" />
+                        <Label Grid.Column="1" Content="{Binding Money}" />
+                        <Label Grid.Column="2" Content="{Binding GamesPlayed}" />
+                        <Label Grid.Column="3" Content="{Binding Stake}" />
+                        <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
+                        <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
+                        <Label Grid.Column="6" Content="{Binding SameNumbers}" />
+                        <Label Grid.Column="7" Content="{Binding System}" />
+                    </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.ItemsPanel>
@@ -150,6 +107,44 @@
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
-
-    </DockPanel>
+        <ListView Grid.Row="3"
+                  HorizontalAlignment="Stretch"
+                  DockPanel.Dock="Top"
+                  ItemsSource="{Binding TopPlayers}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="greatRandom:Player">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="{Binding Name}" />
+                        <Label Grid.Column="1" Content="{Binding SpendMoney}" />
+                        <Label Grid.Column="2" Content="{Binding GamesPlayed}" />
+                        <Label Grid.Column="3" Content="{Binding Stake}" />
+                        <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
+                        <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
+                        <Label Grid.Column="6" Content="{Binding SameNumbers}" />
+                        <Label Grid.Column="7" Content="{Binding System}" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
+    </Grid>
 </Window>
