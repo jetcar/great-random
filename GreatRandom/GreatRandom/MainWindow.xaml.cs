@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using GreatRandom.Annotations;
 
@@ -17,29 +19,46 @@ namespace GreatRandom
     {
         public static byte MAXNUMBER = 64;
         private static Random random = new Random();
+        private Dictionary<int, int> stakes = new Dictionary<int, int>();
         private int _numberOfGames = 0;
         private readonly Calculate _calculate;
-        private ObservableCollection<Player> _players = new ObservableCollection<Player>();
+        private SortableObservableCollection<Player> _players = new SortableObservableCollection<Player>();
         private int _gamesPlayed;
         private int _playerCounter = 1;
         private SortableObservableCollection<Player> _topPlayers = new SortableObservableCollection<Player>();
         private IDictionary<int, NumberStat> numberStatDict = new Dictionary<int, NumberStat>();
-        private ObservableCollection<NumberStat> _numbersStatistic = new ObservableCollection<NumberStat>();
-        private int intStatisticIterations = 100;
+        private SortableObservableCollection<NumberStat> _numbersStatistic = new SortableObservableCollection<NumberStat>();
+        public static int intStatisticIterations = 100;
         private string _statisticIterations = "100";
-
+        private SortableObservableCollection<Player> _dPlayers = new SortableObservableCollection<Player>();
+        private SortableObservableCollection<Player> _dTopPlayers = new SortableObservableCollection<Player>();
+        private bool haveChanges = true;
         public MainWindow()
         {
             _calculate = new Calculate();
             InitializeComponent();
             this.Loaded += MainWindow_Loaded;
-            for (int i = 1; i <= MAXNUMBER; i++)
+            this.Closing += MainWindow_Closing;
+            for (byte i = 1; i <= MAXNUMBER; i++)
             {
                 var numberstat = new NumberStat() { Number = i };
                 numberStatDict[i] = numberstat;
                 _numbersStatistic.Add(numberstat);
             }
+            stakes.Add(1, 1);
+            stakes.Add(2, 2);
+            stakes.Add(3, 5);
+            stakes.Add(4, 10);
+            stakes.Add(5, 15);
 
+        }
+
+        private Thread uiprocessingthread;
+        private Thread gameprocessingthread;
+        void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            uiprocessingthread.Abort();
+            gameprocessingthread.Abort();
         }
 
         void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
@@ -47,24 +66,43 @@ namespace GreatRandom
             for (int i = 0; i < 100; i++)
             {
                 var playernew = CreatePlayer(PlayerCounter++);
-                Dispatcher.Invoke(() =>
-                {
-                    Players.Add(playernew);
 
-                });
+                Players.Add(playernew);
+
+
             }
-            var thread = new Thread(ProcessGames);
-            thread.Start();
+            gameprocessingthread = new Thread(ProcessGames);
+            gameprocessingthread.Start();
+            uiprocessingthread = new Thread(ShowChanges);
+            uiprocessingthread.Start();
 
         }
 
+        private void ShowChanges()
+        {
+            while (true)
+            {
+                if (haveChanges)
+                {
 
+                    haveChanges = false;
+                    Dispatcher.Invoke(() =>
+                    {
+                        DPlayers.Sync(Players);
+                        DTopPlayers.Sync(TopPlayers);
+                    });
+
+                }
+                Thread.Sleep(1);
+            }
+        }
 
         public void ProcessGames()
         {
             int counter = PlayerCounter;
             while (true)
             {
+
                 var numbers = new HashSet<byte>();
                 int randomNumber = 0;
                 while (numbers.Count < 20)
@@ -76,52 +114,68 @@ namespace GreatRandom
                         continue;
                     numbers.Add(value);
                 }
-                foreach (var number in numbers)
+
+                foreach (var numberStat in NumbersStatistic)
                 {
-                    numberStatDict[number].TimesAppear++;
+                    numberStat.Appear(numbers.Contains(numberStat.Number));
                 }
 
-                for (int i = 0; i < Players.Count; i++)
+
+                NumbersStatistic.Sort(x => x.TimesAppear, ListSortDirection.Descending);
+                SortableObservableCollection<Player> childs = new SortableObservableCollection<Player>();
+                SortableObservableCollection<Player> LostPlayers = new SortableObservableCollection<Player>();
+                Parallel.ForEach(Players, (player) =>
                 {
-                    var player = Players[i];
                     GenerateNumbersBuyTickets(player);
                     var moneyWon = Calculate.CalculateTickets(numbers, player.Tickets);
                     if (moneyWon > 1000)
                     {
                         var childsAmount = moneyWon / 1000;
-                        for (int j = 0; j < childsAmount; j++)
+                        for (int j = 0; j < childsAmount && j < 50; j++)
                         {
-                            var child = new Player(player.NumbersAmount, (counter++).ToString(), player.NumberOfTickets, player.Stake, player.SameNumbers, 1000, player.System);
-                            Dispatcher.Invoke(() =>
-                            {
-                                Players.Add(child);
-                            });
+                            var child = new Player(player.NumbersAmount, (counter++).ToString(),
+                                player.NumberOfTickets, player.Stake, player.SameNumbers, 1000, player.System,
+                                player.HotNumbers, player.ColdNumbers);
+                            childs.Add(child);
+
                         }
                     }
                     player.Money += moneyWon;
-                    counter = RenewPlayer(player, counter);
+                    if(player.Money < 0)
+                        LostPlayers.Add(player);
+                   
                     player.GamesPlayed++;
-                }
-
-                while (Players.Count < 100)
+                });
+                foreach (var player in LostPlayers)
                 {
-                    var player = CreatePlayer(counter++);
-                    Dispatcher.Invoke(() =>
-                    {
+                    counter = RenewPlayer(player, counter);
+                }
+               
+                foreach (var child in childs)
+                {
+                    Players.Add(child);
+                }
+                Parallel.For(Players.Count, 100,
+                    index => {
+                        var player = CreatePlayer(counter++);
                         Players.Add(player);
                     });
+
+                while (Players.Count > 2000)
+                {
+                    Players.RemoveAt(Players.Count - 1);
                 }
 
                 PlayerCounter = Players.Count;
                 GamesPlayed++;
+                haveChanges = true;
             }
         }
-
         private int RenewPlayer(Player player, int counter)
         {
             if (player.Money < 0)
             {
-                Dispatcher.Invoke(() => { Players.Remove(player); });
+                Players.Remove(player);
                 var minSpendMoney = 0;
                 var lastPlayer = TopPlayers.LastOrDefault();
                 if (lastPlayer != null)
@@ -130,32 +184,48 @@ namespace GreatRandom
                 }
                 if (player.SpendMoney > minSpendMoney)
                 {
-                    Dispatcher.Invoke(() => { TopPlayers.Add(player); });
+                    TopPlayers.Add(player);
 
                 }
-                Dispatcher.Invoke(() =>
+
+                TopPlayers.Sort(x => x.SpendMoney, ListSortDirection.Descending);
+                while (TopPlayers.Count > 10)
                 {
-                    TopPlayers.Sort(x => x.SpendMoney, ListSortDirection.Descending);
-                    while (TopPlayers.Count > 10)
-                    {
-                        TopPlayers.RemoveAt(TopPlayers.Count - 1);
-                    }
-                });
+                    TopPlayers.RemoveAt(TopPlayers.Count - 1);
+                }
+
 
 
             }
             return counter;
+
         }
 
-        public static void GenerateNumbersBuyTickets(Player player)
+        public void GenerateNumbersBuyTickets(Player player)
         {
             if (player.System != player.NumbersAmount)
             {
                 if (!player.SameNumbers || player.Tickets.Count == 0)
                 {
-                    var array = GenerateRandomsArray(player.NumbersAmount).ToArray();
 
-                    var combinations = GenerateAllPermutations(array, player.System).ToArray();
+                    var array = new HashSet<byte>();
+                    if (player.HotNumbers > 0)
+                    {
+                        for (int i = 0; i < player.HotNumbers; i++)
+                        {
+                            array.Add(NumbersStatistic[i].Number);
+                        }
+                    }
+                    if (player.ColdNumbers > 0)
+                    {
+                        for (int i = 0; i < player.ColdNumbers; i++)
+                        {
+                            array.Add(NumbersStatistic[NumbersStatistic.Count - 1 - i].Number);
+                        }
+                    }
+                    array = GenerateRandomsArray(player.NumbersAmount, array);
+
+                    var combinations = GenerateAllPermutations(array.ToArray(), player.System).ToArray();
                     player.Tickets.Clear();
                     ;
                     foreach (var comb in combinations)
@@ -175,7 +245,21 @@ namespace GreatRandom
                 while (player.Tickets.Count < player.NumberOfTickets)
                 {
                     var ticket = new Ticket();
-                    ticket.Numbers = GenerateRandomsArray(player.System);
+                    if (player.HotNumbers > 0)
+                    {
+                        for (int i = 0; i < player.HotNumbers; i++)
+                        {
+                            ticket.Numbers.Add(NumbersStatistic[i].Number);
+                        }
+                    }
+                    if (player.ColdNumbers > 0)
+                    {
+                        for (int i = 0; i < player.ColdNumbers; i++)
+                        {
+                            ticket.Numbers.Add(NumbersStatistic[NumbersStatistic.Count - 1 - i].Number);
+                        }
+                    }
+                    ticket.Numbers = GenerateRandomsArray(player.System, ticket.Numbers);
                     player.Tickets.Add(ticket);
                 }
                 for (int j = 0; j < player.Tickets.Count; j++)
@@ -183,7 +267,7 @@ namespace GreatRandom
                     var currentTicket = player.Tickets[j];
                     if (!player.SameNumbers || currentTicket.IsWon)
                     {
-                        currentTicket.Numbers = GenerateRandomsArray(player.System);
+                        currentTicket.Numbers = GenerateRandomsArray(player.System, currentTicket.Numbers);
                     }
                     currentTicket.Stake = player.Stake;
 
@@ -216,13 +300,17 @@ namespace GreatRandom
 
         public Player CreatePlayer(int counter)
         {
+
             var numbersAmount = 0;
             var system = 0;
             long combinations = 0;
-            var stake = random.Next(1, 15 + 1);
+            var stake = stakes[random.Next(1, 5 + 1)];
             var Money = 1000;
             long ticketsAmount = 0;
-            while (ticketsAmount < 10)
+            var useSystem = random.Next(0, 2) == 1;
+
+
+            if (useSystem)
             {
                 do
                 {
@@ -234,35 +322,66 @@ namespace GreatRandom
                     }
                     combinations = Combinations(numbersAmount, system);
 
-                } while (combinations*stake > Money || combinations > 50);
+                } while (combinations * stake > Money || combinations > 50);
                 ticketsAmount = combinations;
-                while (ticketsAmount*stake > Money || ticketsAmount == 0)
-                {
-                    ticketsAmount = random.Next(1, Money/stake + 1);
-                }
             }
-            var playernew = new Player(numbersAmount, counter++.ToString(), (int)ticketsAmount, stake, random.Next(0, 2) == 1, Money, system);
+            else
+            {
+                while (ticketsAmount * stake > 100 || ticketsAmount == 0)
+                {
+                    ticketsAmount = random.Next(10, 50 + 1);
+                    stake = stakes[random.Next(1, 5 + 1)];
+                }
+                numbersAmount = random.Next(1, 10 + 1);
+                system = (int)numbersAmount;
+            }
+
+
+            var hotnumbers = 0;
+            var coldnumbers = 0;
+            var useColdHot = random.Next(0, 2) == 1;
+            if (useColdHot)
+            {
+                var hotFirst = random.Next(0, 2) == 1;
+                if (hotFirst)
+                {
+                    hotnumbers = random.Next(0, numbersAmount + 1);
+                    coldnumbers = random.Next(0, numbersAmount - hotnumbers + 1);
+                }
+                else
+                {
+                    coldnumbers = random.Next(0, numbersAmount + 1);
+
+                    hotnumbers = random.Next(0, numbersAmount - coldnumbers + 1);
+
+                }
+
+            }
+            Debug.Assert(numbersAmount > 0);
+            Debug.Assert(numbersAmount >= system);
+            var playernew = new Player(numbersAmount, counter++.ToString(), (int)ticketsAmount, stake, random.Next(0, 2) == 1, Money, system, hotnumbers, coldnumbers);
 
 
             return playernew;
         }
 
-        public static HashSet<byte> GenerateRandomsArray(int numbers)
+        public static HashSet<byte> GenerateRandomsArray(int numbers, HashSet<byte> array = null)
         {
-            var array = new HashSet<byte>();
-            int k = 0;
-            while (k < numbers)
+            if (array == null)
+                array = new HashSet<byte>();
+            while (array.Count < numbers)
             {
                 var rnd = random.Next(1, MAXNUMBER + 1);
                 if (array.Any(x => x == rnd))
                     continue;
                 array.Add((byte)rnd);
-                k++;
             }
             return array;
         }
 
-        public ObservableCollection<NumberStat> NumbersStatistic
+
+
+        public SortableObservableCollection<NumberStat> NumbersStatistic
         {
             get { return _numbersStatistic; }
             set
@@ -295,6 +414,17 @@ namespace GreatRandom
             }
         }
 
+        public SortableObservableCollection<Player> DTopPlayers
+        {
+            get { return _dTopPlayers; }
+            set
+            {
+                if (Equals(value, _dTopPlayers)) return;
+                _dTopPlayers = value;
+                OnPropertyChanged();
+            }
+        }
+
         public SortableObservableCollection<Player> TopPlayers
         {
             get { return _topPlayers; }
@@ -306,7 +436,18 @@ namespace GreatRandom
             }
         }
 
-        public ObservableCollection<Player> Players
+        public SortableObservableCollection<Player> DPlayers
+        {
+            get { return _dPlayers; }
+            set
+            {
+                if (Equals(value, _dPlayers)) return;
+                _dPlayers = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public SortableObservableCollection<Player> Players
         {
             get { return _players; }
             set

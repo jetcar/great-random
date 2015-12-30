@@ -3,14 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:greatRandom="clr-namespace:GreatRandom"
         Title="MainWindow"
-        Width="725"
+        Width="925"
         Height="650"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -24,12 +20,12 @@
             <Label Content="players:" />
             <Label Content="{Binding PlayerCounter}" />
         </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="1">
-            <TextBox Width="100" Text="{Binding StatisticIterations}" />
-            <Button Click="ButtonBase_OnClick">ok</Button>
-        </StackPanel>
+
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -47,31 +43,20 @@
             <Label Grid.Column="5" Content="Numbers" />
             <Label Grid.Column="6" Content="SameNumbers" />
             <Label Grid.Column="7" Content="System" />
+            <Label Grid.Column="8" Content="hot" />
+            <Label Grid.Column="9" Content="cold" />
+            <Label Grid.Column="10" Content="spend" />
         </Grid>
-        <ListView Grid.Row="1"
-                  Grid.RowSpan="3"
-                  Grid.Column="1"
-                  Width="150"
-                  HorizontalAlignment="Stretch"
-                  ItemsSource="{Binding NumbersStatistic}">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate>
-                <DataTemplate DataType="greatRandom:NumberStat">
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="{Binding Number}" />
-                        <Label Content="{Binding TimesAppear}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-
-        </ListView>
         <ListView Grid.Row="2"
                   HorizontalAlignment="Stretch"
-                  ItemsSource="{Binding Players}">
+                  ItemsSource="{Binding DPlayers}">
+            <ListView.Style>
+                <Style>
+                    <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True" />
+                    <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling" />
+                    <Setter Property="ScrollViewer.IsDeferredScrollingEnabled" Value="True" />
+                </Style>
+            </ListView.Style>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -81,6 +66,9 @@
                 <DataTemplate DataType="greatRandom:Player">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -98,6 +86,9 @@
                         <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
                         <Label Grid.Column="6" Content="{Binding SameNumbers}" />
                         <Label Grid.Column="7" Content="{Binding System}" />
+                        <Label Grid.Column="8" Content="{Binding HotNumbers}" />
+                        <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
+                        <Label Grid.Column="10" Content="{Binding SpendMoney}" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -110,7 +101,7 @@
         <ListView Grid.Row="3"
                   HorizontalAlignment="Stretch"
                   DockPanel.Dock="Top"
-                  ItemsSource="{Binding TopPlayers}">
+                  ItemsSource="{Binding DTopPlayers}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -128,15 +119,21 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="{Binding Name}" />
-                        <Label Grid.Column="1" Content="{Binding SpendMoney}" />
+                        <Label Grid.Column="1" Content="{Binding Money}" />
                         <Label Grid.Column="2" Content="{Binding GamesPlayed}" />
                         <Label Grid.Column="3" Content="{Binding Stake}" />
                         <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
                         <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
                         <Label Grid.Column="6" Content="{Binding SameNumbers}" />
                         <Label Grid.Column="7" Content="{Binding System}" />
+                        <Label Grid.Column="8" Content="{Binding HotNumbers}" />
+                        <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
+                        <Label Grid.Column="10" Content="{Binding SpendMoney}" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

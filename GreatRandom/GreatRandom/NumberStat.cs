@@ -12,10 +12,10 @@ namespace GreatRandom
 {
     public class NumberStat : INotifyPropertyChanged
     {
-        private int _timesAppear;
-        public int Number { get; set; }
+        private double _timesAppear;
+        public byte Number { get; set; }
 
-        public int TimesAppear
+        public double TimesAppear
         {
             get { return _timesAppear; }
             set
@@ -33,6 +33,17 @@ namespace GreatRandom
         {
             var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+
+        }
+        IList<bool> history = new List<bool>(); 
+        public void Appear(bool contains)
+        {
+            history.Insert(0,contains);
+            while (history.Count > MainWindow.intStatisticIterations)
+            {
+                history.RemoveAt(history.Count-1);
+            }
+            TimesAppear = history.Count(x => x);
 
         }
     }

@@ -21,8 +21,10 @@ namespace GreatRandom
         private int _gamesPlayed;
         private int _spendMoney;
         private int _system;
+        private int _hotNumbers;
+        private int _coldNumbers;
 
-        public Player(int numbersAmount, string name, int ticketAmount, int stake, bool sameNumbers, int money, int system)
+        public Player(int numbersAmount, string name, int ticketAmount, int stake, bool sameNumbers, int money, int system,int hotnumbers, int coldnumbers)
         {
             NumbersAmount = numbersAmount;
             Name = name;
@@ -31,6 +33,31 @@ namespace GreatRandom
             SameNumbers = sameNumbers;
             Money = money;
             System = system;
+            HotNumbers = hotnumbers;
+            ColdNumbers = coldnumbers;
+        }
+
+
+        public int HotNumbers
+        {
+            get { return _hotNumbers; }
+            set
+            {
+                if (value == _hotNumbers) return;
+                _hotNumbers = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int ColdNumbers
+        {
+            get { return _coldNumbers; }
+            set
+            {
+                if (value == _coldNumbers) return;
+                _coldNumbers = value;
+                OnPropertyChanged();
+            }
         }
 
         public int GamesPlayed
