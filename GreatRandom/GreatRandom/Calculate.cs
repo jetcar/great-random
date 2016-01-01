@@ -10,7 +10,7 @@ namespace GreatRandom
     public class Calculate
     {
 
-        public static int CalculateTickets(HashSet<byte> numbers, IList<Ticket> myTickets)
+        public static int CalculateTickets(HashSet<int> numbers, IList<Ticket> myTickets)
         {
             int TotalWon = 0;
             foreach (var myTicket in myTickets)

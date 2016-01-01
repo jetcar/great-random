@@ -9,16 +9,16 @@ namespace GreatRandom
 {
     public class Ticket
     {
-        private HashSet<byte> _numbers;
+        private HashSet<int> _numbers;
         private int _stake = 1;
         private int _wonAmount;
 
         public Ticket()
         {
-            _numbers = new HashSet<byte>();
+            _numbers = new HashSet<int>();
         }
 
-        public HashSet<byte> Numbers
+        public HashSet<int> Numbers
         {
             get { return _numbers; }
             set { _numbers = value; }

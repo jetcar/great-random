@@ -13,7 +13,7 @@ namespace GreatRandom
     public class NumberStat : INotifyPropertyChanged
     {
         private double _timesAppear;
-        public byte Number { get; set; }
+        public int Number { get; set; }
 
         public double TimesAppear
         {

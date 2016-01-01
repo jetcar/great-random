@@ -88,7 +88,7 @@
                         <Label Grid.Column="7" Content="{Binding System}" />
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />
                         <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
-                        <Label Grid.Column="10" Content="{Binding SpendMoney}" />
+                        <Label Grid.Column="10" Content="{Binding SpendMoney, StringFormat={}{0:C}}" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

@@ -17,7 +17,7 @@ namespace GreatRandom
     /// </summary>
     public partial class MainWindow : INotifyPropertyChanged
     {
-        public static byte MAXNUMBER = 64;
+        public static int MAXNUMBER = 64;
         private static Random random = new Random();
         private Dictionary<int, int> stakes = new Dictionary<int, int>();
         private int _numberOfGames = 0;
@@ -39,7 +39,7 @@ namespace GreatRandom
             InitializeComponent();
             this.Loaded += MainWindow_Loaded;
             this.Closing += MainWindow_Closing;
-            for (byte i = 1; i <= MAXNUMBER; i++)
+            for (int i = 1; i <= MAXNUMBER; i++)
             {
                 var numberstat = new NumberStat() { Number = i };
                 numberStatDict[i] = numberstat;
@@ -103,13 +103,13 @@ namespace GreatRandom
             while (true)
             {
 
-                var numbers = new HashSet<byte>();
+                var numbers = new HashSet<int>();
                 int randomNumber = 0;
                 while (numbers.Count < 20)
                 {
                     randomNumber = random.Next(MAXNUMBER);
 
-                    var value = (byte)(randomNumber % MAXNUMBER + 1);
+                    var value = (int)(randomNumber % MAXNUMBER + 1);
                     if (numbers.Contains(value))
                         continue;
                     numbers.Add(value);
@@ -124,14 +124,14 @@ namespace GreatRandom
                 NumbersStatistic.Sort(x => x.TimesAppear, ListSortDirection.Descending);
                 SortableObservableCollection<Player> childs = new SortableObservableCollection<Player>();
                 SortableObservableCollection<Player> LostPlayers = new SortableObservableCollection<Player>();
-                Parallel.ForEach(Players, (player) =>
+                foreach (var player in Players)
                 {
                     GenerateNumbersBuyTickets(player);
                     var moneyWon = Calculate.CalculateTickets(numbers, player.Tickets);
                     if (moneyWon > 1000)
                     {
-                        var childsAmount = moneyWon / 1000;
-                        for (int j = 0; j < childsAmount && j < 50; j++)
+                        var childsAmount = moneyWon / 10000;
+                        for (int j = 0; j < childsAmount && j < 10; j++)
                         {
                             var child = new Player(player.NumbersAmount, (counter++).ToString(),
                                 player.NumberOfTickets, player.Stake, player.SameNumbers, 1000, player.System,
@@ -141,25 +141,25 @@ namespace GreatRandom
                         }
                     }
                     player.Money += moneyWon;
-                    if(player.Money < 0)
+                    if (player.Money < 0)
                         LostPlayers.Add(player);
-                   
+
                     player.GamesPlayed++;
-                });
+                }
                 foreach (var player in LostPlayers)
                 {
                     counter = RenewPlayer(player, counter);
                 }
-               
+
                 foreach (var child in childs)
                 {
                     Players.Add(child);
                 }
-                Parallel.For(Players.Count, 100,
-                    index => {
-                        var player = CreatePlayer(counter++);
-                        Players.Add(player);
-                    });
+                for (int index = Players.Count; index < 2000; index++)
+                {
+                    var player = CreatePlayer(counter++);
+                    Players.Add(player);
+                }
 
                 while (Players.Count > 2000)
                 {
@@ -208,7 +208,7 @@ namespace GreatRandom
                 if (!player.SameNumbers || player.Tickets.Count == 0)
                 {
 
-                    var array = new HashSet<byte>();
+                    var array = new HashSet<int>();
                     if (player.HotNumbers > 0)
                     {
                         for (int i = 0; i < player.HotNumbers; i++)
@@ -225,7 +225,7 @@ namespace GreatRandom
                     }
                     array = GenerateRandomsArray(player.NumbersAmount, array);
 
-                    var combinations = GenerateAllPermutations(array.ToArray(), player.System).ToArray();
+                    var combinations = combination(array.ToArray(), player.System).ToArray();
                     player.Tickets.Clear();
                     ;
                     foreach (var comb in combinations)
@@ -365,16 +365,16 @@ namespace GreatRandom
             return playernew;
         }
 
-        public static HashSet<byte> GenerateRandomsArray(int numbers, HashSet<byte> array = null)
+        public static HashSet<int> GenerateRandomsArray(int numbers, HashSet<int> array = null)
         {
             if (array == null)
-                array = new HashSet<byte>();
+                array = new HashSet<int>();
             while (array.Count < numbers)
             {
                 var rnd = random.Next(1, MAXNUMBER + 1);
                 if (array.Any(x => x == rnd))
                     continue;
-                array.Add((byte)rnd);
+                array.Add((int)rnd);
             }
             return array;
         }
@@ -483,10 +483,6 @@ namespace GreatRandom
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
-
-
-
-
         public static IEnumerable<T[]> GenerateAllPermutations<T>(T[] source, int count) where T : IComparable
         {
             return GetKCombs(source, count).Select(x => x.ToArray());
@@ -499,10 +495,74 @@ namespace GreatRandom
                     (t1, t2) => t1.Concat(new T[] { t2 }));
         }
 
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        public static IList<int[]> combination(int[] elements, int K)
         {
-            intStatisticIterations = Convert.ToInt32(StatisticIterations);
+            IList<int[]> result = new List<int[]>();
+
+            // get the length of the array
+            // e.g. for {'A','B','C','D'} => N = 4 
+            int N = elements.Length;
+
+            if (K > N)
+            {
+                return null;
+            }
+            // calculate the possible combinations
+            // e.g. c(4,2)
+            //c(N,K);
+
+            // get the combination by index 
+            // e.g. 01 --> AB , 23 --> CD
+            int[] combination = new int[K];
+
+            // position of current index
+            //  if (r = 1)              r*
+            //  index ==>        0   |   1   |   2
+            //  element ==>      A   |   B   |   C
+            int r = 0;
+            int index = 0;
+
+            while (r >= 0)
+            {
+                // possible indexes for 1st position "r=0" are "0,1,2" --> "A,B,C"
+                // possible indexes for 2nd position "r=1" are "1,2,3" --> "B,C,D"
+
+                // for r = 0 ==> index < (4+ (0 - 2)) = 2
+                if (index <= (N + (r - K)))
+                {
+                    combination[r] = index;
+
+                    // if we are at the last position print and increase the index
+                    if (r == K - 1)
+                    {
+
+                        //do something with the combination e.g. add to list or print
+                        var array = new int[combination.Length];
+                        for (int i = 0; i < combination.Length; i++)
+                        {
+                            array[i] = elements[combination[i]];
+                        }
+                        result.Add(array);
+                        //print(combination, elements);
+                        index++;
+                    }
+                    else
+                    {
+                        // select index for next position
+                        index = (int)(combination[r] + 1);
+                        r++;
+                    }
+                }
+                else
+                {
+                    r--;
+                    if (r > 0)
+                        index = (int)(combination[r] + 1);
+                    else
+                        index = (int)(combination[0] + 1);
+                }
+            }
+            return result;
         }
     }
 }

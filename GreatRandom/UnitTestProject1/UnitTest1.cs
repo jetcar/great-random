@@ -49,7 +49,7 @@ namespace UnitTestProject1
         public void TestMethodCombinations()
         {
             var array = MainWindow.GenerateRandomsArray(6);
-            byte[] byteArray = new byte[6];
+            int[] byteArray = new int[6];
             array.CopyTo(byteArray);
             Assert.AreEqual((int)MainWindow.Combinations(6, 2), MainWindow.GenerateAllPermutations(byteArray, 2).ToArray().Length);
         }
