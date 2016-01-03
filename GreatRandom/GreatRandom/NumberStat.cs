@@ -12,18 +12,21 @@ namespace GreatRandom
 {
     public class NumberStat : INotifyPropertyChanged
     {
-        private double _timesAppear;
         public int Number { get; set; }
+        private IDictionary<int, int> appersDict = new Dictionary<int, int>();
 
-        public double TimesAppear
+        public int TimesAppear(int fromRange)
         {
-            get { return _timesAppear; }
-            set
+            if (appersDict.ContainsKey(fromRange))
+                return appersDict[fromRange];
+            var appears = 0;
+            for (int i = 0; i < fromRange; i++)
             {
-                if (value == _timesAppear) return;
-                _timesAppear = value;
-                OnPropertyChanged();
+                if (history[i])
+                    appears++;
             }
+            appersDict[fromRange] = appears;
+            return appears;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -35,15 +38,15 @@ namespace GreatRandom
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
 
         }
-        IList<bool> history = new List<bool>(); 
+        IList<bool> history = new List<bool>();
         public void Appear(bool contains)
         {
-            history.Insert(0,contains);
+            history.Insert(0, contains);
             while (history.Count > MainWindow.intStatisticIterations)
             {
-                history.RemoveAt(history.Count-1);
+                history.RemoveAt(history.Count - 1);
             }
-            TimesAppear = history.Count(x => x);
+            appersDict.Clear();
 
         }
     }

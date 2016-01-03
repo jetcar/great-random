@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using GreatRandom.Annotations;
 
 namespace GreatRandom
@@ -23,8 +24,15 @@ namespace GreatRandom
         private int _system;
         private int _hotNumbers;
         private int _coldNumbers;
+        private int _currentMinus;
+        private int _biggestMinus;
+        private int _coldRange;
+        private int _hotRange;
+        private int _statRange;
+        private bool _showTickets;
+        private Visibility _showTicketsVisibility = Visibility.Collapsed;
 
-        public Player(int numbersAmount, string name, int ticketAmount, int stake, bool sameNumbers, int money, int system,int hotnumbers, int coldnumbers)
+        public Player(int numbersAmount, string name, int ticketAmount, int stake, bool sameNumbers, int money, int system, int hotnumbers, int coldnumbers, int hotRange, int coldRange,int statRange)
         {
             NumbersAmount = numbersAmount;
             Name = name;
@@ -35,6 +43,61 @@ namespace GreatRandom
             System = system;
             HotNumbers = hotnumbers;
             ColdNumbers = coldnumbers;
+            HotRange = hotRange;
+            ColdRange = coldRange;
+            StatRange = statRange;
+        }
+
+        public Visibility ShowTicketsVisibility
+        {
+            get { return _showTicketsVisibility; }
+            set
+            {
+                if (value == _showTicketsVisibility) return;
+                _showTicketsVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ShowTickets
+        {
+            get { return _showTickets; }
+            set
+            {
+                if (value == _showTickets) return;
+                _showTickets = value;
+                if (value)
+                {
+                    ShowTicketsVisibility = Visibility.Visible;
+                }
+                else
+                {
+                    ShowTicketsVisibility = Visibility.Collapsed;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        public int ColdRange
+        {
+            get { return _coldRange; }
+            set
+            {
+                if (value == _coldRange) return;
+                _coldRange = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int HotRange
+        {
+            get { return _hotRange; }
+            set
+            {
+                if (value == _hotRange) return;
+                _hotRange = value;
+                OnPropertyChanged();
+            }
         }
 
 
@@ -170,9 +233,44 @@ namespace GreatRandom
             }
         }
 
+        public int BiggestMinus
+        {
+            get { return _biggestMinus; }
+            set
+            {
+                if (value == _biggestMinus) return;
+                _biggestMinus = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int CurrentMinus
+        {
+            get { return _currentMinus; }
+            set
+            {
+                if (value == _currentMinus) return;
+                _currentMinus = value;
+                if (_currentMinus > BiggestMinus)
+                    BiggestMinus = _currentMinus;
+                OnPropertyChanged();
+            }
+        }
+
+        public int StatRange
+        {
+            get { return _statRange; }
+            set
+            {
+                if (value == _statRange) return;
+                _statRange = value;
+                OnPropertyChanged();
+            }
+        }
+
         public override string ToString()
         {
-            return String.Format("\nname {0} \n money {1}\n tickets {2} \n samenumbers {3} \n numbers {4} \n played {5} \n stake {6} \nsystem {7}",Name,Money,NumberOfTickets,SameNumbers,NumbersAmount,GamesPlayed,Stake,System);
+            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}", NumberOfTickets, SameNumbers, NumbersAmount, GamesPlayed, Stake, System,ColdNumbers,ColdRange,HotNumbers,HotRange,StatRange,System);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

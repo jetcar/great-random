@@ -12,7 +12,8 @@ namespace GreatRandom
         private HashSet<int> _numbers;
         private int _stake = 1;
         private int _wonAmount;
-
+        public int wonNumbers;
+        public int wonAmount;
         public Ticket()
         {
             _numbers = new HashSet<int>();

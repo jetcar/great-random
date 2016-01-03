@@ -59,10 +59,19 @@
     <Compile Include="UnitTest2.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\bjects\objects.csproj">
+      <Project>{55c1d2ee-9885-4ff8-aed2-99a0cdbca6cc}</Project>
+      <Name>objects</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GreatRandom\GreatRandom.csproj">
       <Project>{DD0AC957-593E-42A1-9B8F-D5AA0E2CBF64}</Project>
       <Name>GreatRandom</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

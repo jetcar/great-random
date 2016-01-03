@@ -34,6 +34,12 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Name" />
             <Label Grid.Column="1" Content="Money" />
@@ -46,6 +52,12 @@
             <Label Grid.Column="8" Content="hot" />
             <Label Grid.Column="9" Content="cold" />
             <Label Grid.Column="10" Content="spend" />
+            <Label Grid.Column="11" Content="minus" />
+            <Label Grid.Column="12" Content="Max minus" />
+            <Label Grid.Column="13" Content="hot range" />
+            <Label Grid.Column="14" Content="cold range" />
+            <Label Grid.Column="15" Content="stat range" />
+            <Label Grid.Column="16" Content="tickets" />
         </Grid>
         <ListView Grid.Row="2"
                   HorizontalAlignment="Stretch"
@@ -65,7 +77,17 @@
             <ListView.ItemTemplate>
                 <DataTemplate DataType="greatRandom:Player">
                     <Grid HorizontalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -89,6 +111,35 @@
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />
                         <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
                         <Label Grid.Column="10" Content="{Binding SpendMoney, StringFormat={}{0:C}}" />
+                        <Label Grid.Column="11" Content="{Binding CurrentMinus, StringFormat={}{0:C}}" />
+                        <Label Grid.Column="12" Content="{Binding BiggestMinus, StringFormat={}{0:C}}" />
+                        <Label Grid.Column="13" Content="{Binding HotRange}" />
+                        <Label Grid.Column="14" Content="{Binding ColdRange}" />
+                        <Label Grid.Column="15" Content="{Binding StatRange}" />
+                        <ToggleButton Grid.Column="16"
+                                      Content="+"
+                                      IsChecked="{Binding ShowTickets}" />
+                        <ListView Grid.Row="1"
+                                  Grid.ColumnSpan="16"
+                                  ItemsSource="{Binding Tickets}"
+                                  Visibility="{Binding ShowTicketsVisibility}">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate DataType="greatRandom:Ticket">
+                                    <ListView ItemsSource="{Binding Numbers}">
+                                        <ListView.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ListView.ItemsPanel>
+                                    </ListView>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -122,6 +173,12 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="{Binding Name}" />
                         <Label Grid.Column="1" Content="{Binding Money}" />
@@ -134,6 +191,12 @@
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />
                         <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
                         <Label Grid.Column="10" Content="{Binding SpendMoney}" />
+                        <Label Grid.Column="11" Content="{Binding CurrentMinus, StringFormat={}{0:C}}" />
+                        <Label Grid.Column="12" Content="{Binding BiggestMinus, StringFormat={}{0:C}}" />
+                        <Label Grid.Column="13" Content="{Binding HotRange}" />
+                        <Label Grid.Column="14" Content="{Binding ColdRange}" />
+                        <Label Grid.Column="15" Content="{Binding StatRange}" />
+
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

@@ -15,6 +15,8 @@ namespace GreatRandom
             int TotalWon = 0;
             foreach (var myTicket in myTickets)
             {
+                myTicket.wonAmount = 0;
+                myTicket.wonNumbers = 0;
                 var wonNumbersAmount = 0;
                 foreach (var number in myTicket.Numbers)
                 {
@@ -44,6 +46,8 @@ namespace GreatRandom
                                 break;
                             case 2:
                                 wonAmount = myTicket.Stake * 5;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 2;
                                 break;
                         }
 
@@ -57,9 +61,13 @@ namespace GreatRandom
                                 break;
                             case 2:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 2;
                                 break;
                             case 3:
                                 wonAmount = myTicket.Stake * 11;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 3;
                                 break;
                         }
                         break;
@@ -68,6 +76,8 @@ namespace GreatRandom
                         {
                             case 0:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 0;
                                 break;
                             case 1:
                                 break;
@@ -75,9 +85,13 @@ namespace GreatRandom
                                 break;
                             case 3:
                                 wonAmount = myTicket.Stake * 2;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 3;
                                 break;
                             case 4:
                                 wonAmount = myTicket.Stake * 20;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 4;
                                 break;
                         }
                         break;
@@ -86,6 +100,8 @@ namespace GreatRandom
                         {
                             case 0:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 0;
                                 break;
                             case 1:
                                 break;
@@ -93,12 +109,18 @@ namespace GreatRandom
                                 break;
                             case 3:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 3;
                                 break;
                             case 4:
                                 wonAmount = myTicket.Stake * 4;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 4;
                                 break;
                             case 5:
                                 wonAmount = myTicket.Stake * 50;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 5;
                                 break;
                         }
                         break;
@@ -107,6 +129,8 @@ namespace GreatRandom
                         {
                             case 0:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 0;
                                 break;
                             case 1:
                                 break;
@@ -116,12 +140,18 @@ namespace GreatRandom
                                 break;
                             case 4:
                                 wonAmount = myTicket.Stake * 2;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 4;
                                 break;
                             case 5:
                                 wonAmount = myTicket.Stake * 20;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 5;
                                 break;
                             case 6:
                                 wonAmount = myTicket.Stake * 200;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 6;
                                 break;
                         }
                         break;
@@ -130,6 +160,8 @@ namespace GreatRandom
                         {
                             case 0:
                                 wonAmount = myTicket.Stake * 2;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 0;
                                 break;
                             case 1:
                                 break;
@@ -139,15 +171,23 @@ namespace GreatRandom
                                 break;
                             case 4:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 4;
                                 break;
                             case 5:
                                 wonAmount = myTicket.Stake * 4;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 5;
                                 break;
                             case 6:
                                 wonAmount = myTicket.Stake * 40;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 6;
                                 break;
                             case 7:
                                 wonAmount = myTicket.Stake * 600;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 7;
                                 break;
                         }
                         break;
@@ -156,6 +196,8 @@ namespace GreatRandom
                         {
                             case 0:
                                 wonAmount = myTicket.Stake * 2;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 0;
                                 break;
                             case 1:
                                 break;
@@ -165,18 +207,28 @@ namespace GreatRandom
                                 break;
                             case 4:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 4;
                                 break;
                             case 5:
                                 wonAmount = myTicket.Stake * 2;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 5;
                                 break;
                             case 6:
                                 wonAmount = myTicket.Stake * 10;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 6;
                                 break;
                             case 7:
                                 wonAmount = myTicket.Stake * 100;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 7;
                                 break;
                             case 8:
                                 wonAmount = myTicket.Stake * 2000;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 8;
                                 break;
                         }
                         break;
@@ -185,6 +237,8 @@ namespace GreatRandom
                         {
                             case 0:
                                 wonAmount = myTicket.Stake * 3;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 0;
                                 break;
                             case 1:
                                 break;
@@ -196,18 +250,28 @@ namespace GreatRandom
                                 break;
                             case 5:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 5;
                                 break;
                             case 6:
                                 wonAmount = myTicket.Stake * 5;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 6;
                                 break;
                             case 7:
                                 wonAmount = myTicket.Stake * 50;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 7;
                                 break;
                             case 8:
                                 wonAmount = myTicket.Stake * 400;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 8;
                                 break;
                             case 9:
                                 wonAmount = myTicket.Stake * 7000;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 9;
                                 break;
                         }
                         break;
@@ -216,6 +280,8 @@ namespace GreatRandom
                         {
                             case 0:
                                 wonAmount = myTicket.Stake * 3;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 2;
                                 break;
                             case 1:
                                 break;
@@ -227,21 +293,33 @@ namespace GreatRandom
                                 break;
                             case 5:
                                 wonAmount = myTicket.Stake * 1;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 5;
                                 break;
                             case 6:
                                 wonAmount = myTicket.Stake * 2;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 6;
                                 break;
                             case 7:
                                 wonAmount = myTicket.Stake * 10;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 7;
                                 break;
                             case 8:
                                 wonAmount = myTicket.Stake * 140;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 8;
                                 break;
                             case 9:
                                 wonAmount = myTicket.Stake * 1400;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 9;
                                 break;
                             case 10:
                                 wonAmount = myTicket.Stake * 20000;
+                                myTicket.wonAmount = wonAmount;
+                                myTicket.wonNumbers = 10;
                                 break;
                         }
                         break;
