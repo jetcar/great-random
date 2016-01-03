@@ -24,7 +24,7 @@
 
         protected override async Task CloseAsync()
         {
-            // TODO: unsubscribe from event   s here
+            // TODO: unsubscribe fro   m event   s here
 
             await base.CloseAsync();
         }

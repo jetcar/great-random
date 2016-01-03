@@ -43,4 +43,6 @@ Temporary Items
 .apdisk
 bin
 obj
+packages
+TestResults
 
