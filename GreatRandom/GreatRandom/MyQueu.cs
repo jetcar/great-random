@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace GreatRandom
 {
     internal class MyQueu<T>
     {
-        Queue<MyActionWrapper<T>> internalQueue = new Queue<MyActionWrapper<T>>();
+        ConcurrentQueue<MyActionWrapper<T>> internalQueue = new ConcurrentQueue<MyActionWrapper<T>>();
         object locker = new object();
 
         public bool HaveItem
@@ -23,7 +25,13 @@ namespace GreatRandom
         {
             lock (locker)
             {
-                return internalQueue.Dequeue();
+                MyActionWrapper<T> result;
+                while (!internalQueue.TryDequeue(out result))
+                {
+                    Thread.Sleep(1);
+                }
+                
+                return result;
             }
         }
 

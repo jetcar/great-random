@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -10,37 +12,39 @@ namespace GreatRandom
     public class MyThreadPool<T>
     {
         static IList<ThreadWrapper> myThreads = new List<ThreadWrapper>();
-        static IDictionary<int, MyQueu<T>> queues = new Dictionary<int, MyQueu<T>>();
+        static IDictionary<int, ConcurrentQueue<MyActionWrapper<T>>> queues = new Dictionary<int, ConcurrentQueue<MyActionWrapper<T>>>();
         private static int counter = 0;
+        private static int _processedCount;
+
 
         public static void Foreach(SortableObservableCollection<T> source, Action<T> action)
         {
             if (myThreads.Count == 0)
             {
-                for (int i = 0; i < Environment.ProcessorCount-1; i++)
+                for (int i = 0; i < Environment.ProcessorCount - 1; i++)
                 {
                     var thread = new Thread(ProcessThreadQueue);
-                    var wrapper = new ThreadWrapper() {Thread = thread, Id = counter++};
+                    var wrapper = new ThreadWrapper() { Thread = thread, Id = counter++ };
                     myThreads.Add(wrapper);
-                    queues.Add(wrapper.Id, new MyQueu<T>());
+                    queues.Add(wrapper.Id, new ConcurrentQueue<MyActionWrapper<T>>());
                 }
                 foreach (var myThread in myThreads)
                 {
                     myThread.Thread.Start(myThread);
                 }
             }
+            Debug.Assert(_processedCount == 0);
             for (int i = 0; i < source.Count(); i++)
             {
-                var thread = myThreads[i % (myThreads.Count - 1)];
+                Interlocked.Increment(ref _processedCount);
+                var index = i % (myThreads.Count);
+                var thread = myThreads[index];
                 var queue = queues[thread.Id];
-                queue.Add(action, source[i]);
-                if (i == source.Count - 1)
-                {
-                    while (queues.Any(x => x.Value.HaveItem == true))
-                    {
-                        Thread.Sleep(1);
-                    }
-                }
+                queue.Enqueue(new MyActionWrapper<T>(action, source[i]));
+            }
+            while (_processedCount > 0)
+            {
+                Thread.Sleep(1);
             }
             //foreach (var myThread in myThreads)
             //{
@@ -51,15 +55,21 @@ namespace GreatRandom
 
         private static void ProcessThreadQueue(object ob)
         {
-            ThreadWrapper threadWrapper = (ThreadWrapper) ob;
+            ThreadWrapper threadWrapper = (ThreadWrapper)ob;
             while (true)
             {
                 var queue = queues[threadWrapper.Id];
-                while (queue.HaveItem)
+                while (!queue.IsEmpty)
                 {
-                    var wrapper = queue.Get();
+                    MyActionWrapper<T> wrapper;
+                    while (!queue.TryDequeue(out wrapper))
+                    {
+                        Thread.Sleep(1);
+                    }
                     wrapper.action.Invoke(wrapper.value);
+                    Interlocked.Decrement(ref _processedCount);
                 }
+                Thread.Sleep(1);
             }
         }
     }

@@ -117,8 +117,8 @@ namespace GreatRandom
 
                 SortableObservableCollection<Player> childs = new SortableObservableCollection<Player>();
                 SortableObservableCollection<Player> lostPlayers = new SortableObservableCollection<Player>();
-                //                                MyThreadPool<Player>.Foreach(Players, player =>
-                foreach (var player in Players)
+                                                MyThreadPool<Player>.Foreach(Players, player =>
+//                foreach (var player in Players)
                 {
                     var tempStat = new SortableObservableCollection<NumberStat>();
                     if (player.ColdNumbers + player.HotNumbers > 0)
@@ -127,8 +127,8 @@ namespace GreatRandom
                         var player1 = player;
                         tempStat.Sort(x => x.TimesAppear(player1.StatRange), ListSortDirection.Descending);
                     }
-
-                    GenerateNumbersBuyTickets(player, tempStat);
+                    var random = new Random();
+                    GenerateNumbersBuyTickets(player, tempStat,random);
                     player.CurrentMinus += player.Tickets.Count * player.Stake;
                     var moneyWon = Calculate.CalculateTickets(numbers, player.Tickets);
                     //if (moneyWon > 1000)
@@ -158,8 +158,8 @@ namespace GreatRandom
 //                      lostPlayers.Add(player);
 
                     player.GamesPlayed++;
-                }
-                //                });
+//                }
+                                });
 
 
                 foreach (var numberStat in NumbersStatistic)
@@ -223,6 +223,7 @@ namespace GreatRandom
                 TopPlayers.Add(player);
 
             }
+            player.SpendMoney += player.Money;
 
             TopPlayers.Sort(x => x.SpendMoney, ListSortDirection.Descending);
             while (TopPlayers.Count > 10)
@@ -236,7 +237,7 @@ namespace GreatRandom
 
         }
 
-        public void GenerateNumbersBuyTickets(Player player, SortableObservableCollection<NumberStat> stats)
+        public void GenerateNumbersBuyTickets(Player player, SortableObservableCollection<NumberStat> stats,Random random)
         {
             if (player.System != player.NumbersAmount)
             {
@@ -263,7 +264,7 @@ namespace GreatRandom
 
                         }
                     }
-                    array = GenerateRandomsArray(player.NumbersAmount, array);
+                    array = GenerateRandomsArray(player.NumbersAmount, array,random);
 
                     var combinations = combination(array.ToArray(), player.System).ToArray();
                     player.Tickets.Clear();
@@ -304,7 +305,7 @@ namespace GreatRandom
 
                         }
                     }
-                    ticket.Numbers = GenerateRandomsArray(player.System, ticket.Numbers);
+                    ticket.Numbers = GenerateRandomsArray(player.System, ticket.Numbers,random);
                     player.Tickets.Add(ticket);
                 }
                 for (int j = 0; j < player.Tickets.Count; j++)
@@ -312,7 +313,7 @@ namespace GreatRandom
                     var currentTicket = player.Tickets[j];
                     if (!player.SameNumbers || currentTicket.IsWon)
                     {
-                        currentTicket.Numbers = GenerateRandomsArray(player.System, currentTicket.Numbers);
+                        currentTicket.Numbers = GenerateRandomsArray(player.System, currentTicket.Numbers,random);
                     }
                     currentTicket.Stake = player.Stake;
 
@@ -420,14 +421,14 @@ namespace GreatRandom
             }
             return result;
         }
-        public HashSet<int> GenerateRandomsArray(int numbers, HashSet<int> array = null)
+        public HashSet<int> GenerateRandomsArray(int numbers, HashSet<int> array, Random random1)
         {
             if (array == null)
                 array = new HashSet<int>();
             while (array.Count < numbers)
             {
                 var rnd = random.Next(1, generator.Maxnumber + 1);
-                if (array.Any(x => x == rnd))
+                if (array.Contains(rnd))
                     continue;
                 array.Add((int)rnd);
             }
@@ -536,17 +537,7 @@ namespace GreatRandom
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
-        public static IEnumerable<T[]> GenerateAllPermutations<T>(T[] source, int count) where T : IComparable
-        {
-            return GetKCombs(source, count).Select(x => x.ToArray());
-        }
-        static IEnumerable<IEnumerable<T>> GetKCombs<T>(IEnumerable<T> list, int length) where T : IComparable
-        {
-            if (length == 1) return list.Select(t => new T[] { t });
-            return GetKCombs(list, length - 1)
-                .SelectMany(t => list.Where(o => o.CompareTo(t.Last()) > 0),
-                    (t1, t2) => t1.Concat(new T[] { t2 }));
-        }
+
 
         public static IList<int[]> combination(int[] elements, int K)
         {
