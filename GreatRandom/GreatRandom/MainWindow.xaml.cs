@@ -421,7 +421,7 @@ namespace GreatRandom
             }
             return result;
         }
-        public HashSet<int> GenerateRandomsArray(int numbers, HashSet<int> array, Random random1)
+        public HashSet<int> GenerateRandomsArray(int numbers, HashSet<int> array, Random random)
         {
             if (array == null)
                 array = new HashSet<int>();
