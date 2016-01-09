@@ -14,7 +14,7 @@ namespace GreatRandom
     {
         private int _amount = 20;
         private string _path = "..\\..\\..\\..\\..\\WpfApplication2\\WpfApplication1\\test.xml";
-        private int _currentIndex = 7800;
+        private int _currentIndex = 0;
         public int Maxnumber { get { return 64; } }
         public bool HaveNext { get { return CurrentIndex < results.Count - 1; } }
         public ObservableCollection<Result> results { get; set; }
@@ -51,6 +51,10 @@ namespace GreatRandom
             for (int i = 0; i < result.Results.Length; i++)
             {
                 numbers.Add(result.Results[i]);
+            }
+            if (CurrentIndex == results.Count-1)
+            {
+                CurrentIndex = 0;
             }
             return numbers;
 

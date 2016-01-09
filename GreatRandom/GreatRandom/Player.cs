@@ -6,7 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Serialization;
 using GreatRandom.Annotations;
+using Newtonsoft.Json;
 
 namespace GreatRandom
 {
@@ -31,8 +33,14 @@ namespace GreatRandom
         private int _statRange;
         private bool _showTickets;
         private Visibility _showTicketsVisibility = Visibility.Collapsed;
+        private Random _random;
+        private bool _saved;
 
-        public Player(int numbersAmount, string name, int ticketAmount, int stake, bool sameNumbers, int money, int system, int hotnumbers, int coldnumbers, int hotRange, int coldRange,int statRange)
+        public Player()
+        {
+            Random = new Random();
+        }
+        public Player(int numbersAmount, string name, int ticketAmount, int stake, bool sameNumbers, int money, int system, int hotnumbers, int coldnumbers, int hotRange, int coldRange,int statRange, Random random)
         {
             NumbersAmount = numbersAmount;
             Name = name;
@@ -46,8 +54,16 @@ namespace GreatRandom
             HotRange = hotRange;
             ColdRange = coldRange;
             StatRange = statRange;
+            Random = random;
+        }
+        [JsonIgnoreAttribute]
+        public Random Random
+        {
+            get { return _random; }
+            set { _random = value; }
         }
 
+        [JsonIgnoreAttribute]
         public Visibility ShowTicketsVisibility
         {
             get { return _showTicketsVisibility; }
@@ -59,6 +75,18 @@ namespace GreatRandom
             }
         }
 
+        public bool Saved
+        {
+            get { return _saved; }
+            set
+            {
+                if (value == _saved) return;
+                _saved = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [JsonIgnoreAttribute]
         public bool ShowTickets
         {
             get { return _showTickets; }
@@ -77,7 +105,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int ColdRange
         {
             get { return _coldRange; }
@@ -88,7 +116,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int HotRange
         {
             get { return _hotRange; }
@@ -100,7 +128,7 @@ namespace GreatRandom
             }
         }
 
-
+        [JsonProperty]
         public int HotNumbers
         {
             get { return _hotNumbers; }
@@ -111,7 +139,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int ColdNumbers
         {
             get { return _coldNumbers; }
@@ -122,7 +150,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int GamesPlayed
         {
             get { return _gamesPlayed; }
@@ -133,7 +161,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonIgnoreAttribute]
         public IList<Ticket> Tickets
         {
             get { return _tickets; }
@@ -144,7 +172,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public string Name
         {
             get { return _name; }
@@ -155,7 +183,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int NumberOfTickets
         {
             get { return _numberOfTickets; }
@@ -166,7 +194,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int NumbersAmount
         {
             get { return _numbersAmount; }
@@ -177,7 +205,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public bool SameNumbers
         {
             get { return _sameNumbers; }
@@ -188,7 +216,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int Stake
         {
             get { return _stake; }
@@ -199,7 +227,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int Money
         {
             get { return _money; }
@@ -211,6 +239,7 @@ namespace GreatRandom
             }
         }
 
+        [JsonIgnoreAttribute]
         public int SpendMoney
         {
             get { return _spendMoney; }
@@ -221,7 +250,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int System
         {
             get { return _system; }
@@ -233,6 +262,7 @@ namespace GreatRandom
             }
         }
 
+        [JsonIgnoreAttribute]
         public int BiggestMinus
         {
             get { return _biggestMinus; }
@@ -243,7 +273,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonIgnoreAttribute]
         public int CurrentMinus
         {
             get { return _currentMinus; }
@@ -256,7 +286,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-
+        [JsonProperty]
         public int StatRange
         {
             get { return _statRange; }

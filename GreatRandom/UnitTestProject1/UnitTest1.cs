@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -14,11 +15,13 @@ namespace UnitTestProject1
         public void TestMethod1()
         {
             MainWindow window = new MainWindow();
+            var random = new Random();
             for (int i = 0; i < 1000; i++)
             {
+
                 var player = window.CreatePlayer(window.PlayerCounter++);
                 Assert.AreEqual(0, player.Tickets.Count);
-                Assert.AreEqual(1000, player.Money);
+                Assert.AreEqual(MainWindow.startMoney, player.Money);
                 Assert.IsTrue(player.NumberOfTickets > 0);
                 Assert.IsTrue(player.NumbersAmount >= player.System);
                 Assert.IsTrue(player.NumberOfTickets * player.Stake <= player.Money, player.ToString());
@@ -26,9 +29,9 @@ namespace UnitTestProject1
                 Assert.IsTrue(player.HotRange >= player.HotNumbers);
                 if (player.NumbersAmount != player.System)
                     Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, player.ToString());
-                Assert.AreEqual((window.PlayerCounter - 1).ToString(), player.Name);
+                //Assert.AreEqual((window.PlayerCounter).ToString(), player.Name);
 
-                window.GenerateNumbersBuyTickets(player, window.NumbersStatistic);
+                window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
                 foreach (var ticket in player.Tickets)
                 {
                     Assert.AreEqual(ticket.Stake, player.Stake);
@@ -39,8 +42,8 @@ namespace UnitTestProject1
                     }
                 }
                 Assert.AreEqual(player.Tickets.Count, player.NumberOfTickets, 0, player.ToString());
-                Assert.AreEqual(1000 - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
-                Assert.AreEqual(1000 - player.Money, player.SpendMoney, 0, player.ToString());
+                Assert.AreEqual(MainWindow.startMoney - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
+                Assert.AreEqual(MainWindow.startMoney - player.Money, player.SpendMoney, 0, player.ToString());
                 //                Console.WriteLine(i);
 
             }
@@ -52,11 +55,12 @@ namespace UnitTestProject1
         public void TestMethodCombinations()
         {
             MainWindow window = new MainWindow();
-
-            var array = window.GenerateRandomsArray(6);
+            var random = new Random();
+            HashSet<int> arrayinput = new HashSet<int>();
+            var array = window.GenerateRandomsArray(6,arrayinput,random);
             int[] byteArray = new int[6];
             array.CopyTo(byteArray);
-            Assert.AreEqual((int)MainWindow.Combinations(6, 2), MainWindow.GenerateAllPermutations(byteArray, 2).ToArray().Length);
+            Assert.AreEqual((int)MainWindow.Combinations(6, 2), MainWindow.combination(byteArray, 2).ToArray().Length);
         }
 
 
@@ -65,11 +69,12 @@ namespace UnitTestProject1
         public void GenerateTickets()
         {
             MainWindow window = new MainWindow();
+            var random = new Random();
             window.generator = new KenoLoader();
             var generator = (KenoLoader)window.generator;
             generator.Path = "test.xml";
             generator.Load();
-            var player = new Player(8, "Loaded4", 28, 1, false, 100, 6, 7, 0, 11, 21, 1);
+            var player = new Player(8, "Loaded4", 28, 1, false, 100, 6, 7, 0, 11, 21, 1,new Random() );
 
             for (int i = 7800; i < generator.results.Count; i++)
             {
@@ -82,7 +87,7 @@ namespace UnitTestProject1
                 tempStat.Sync(window.NumbersStatistic);
                 tempStat.Sort(x => x.TimesAppear(player.StatRange), ListSortDirection.Descending);
 
-                window.GenerateNumbersBuyTickets(player, window.NumbersStatistic);
+                window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
                 var wonMoney = Calculate.CalculateTickets(numbers, player.Tickets);
                 Console.WriteLine(wonMoney);
 
@@ -100,7 +105,7 @@ namespace UnitTestProject1
             //}
             Console.WriteLine();
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
 
             foreach (var ticket in player.Tickets)
             {
@@ -125,13 +130,14 @@ namespace UnitTestProject1
             player.SameNumbers = true;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
+            var random = new Random();
 
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
             Assert.AreEqual(player.Tickets.Count, player.NumberOfTickets, 0, player.ToString());
 
-            Assert.AreEqual(1000 - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
-            Assert.AreEqual(1000 - player.Money, player.SpendMoney, 0, player.ToString());
+            Assert.AreEqual(MainWindow.startMoney - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
+            Assert.AreEqual(MainWindow.startMoney - player.Money, player.SpendMoney, 0, player.ToString());
 
             foreach (var ticket in player.Tickets)
             {
@@ -143,6 +149,90 @@ namespace UnitTestProject1
             }
 
 
+        }
+        [TestMethod]
+        public void TestMethodPlayerNotSameNumbers()
+        {
+            MainWindow window = new MainWindow();
+
+            var player = window.CreatePlayer(window.PlayerCounter++);
+            player.NumbersAmount = 12;
+            player.System = 10;
+            player.Stake = 2;
+            player.SameNumbers = false;
+            player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
+            Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
+            var random = new Random();
+
+
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+            IList<int> numbers = new List<int>();
+            foreach (var ticket in player.Tickets)
+            {
+                Assert.AreEqual(ticket.Stake, player.Stake);
+                foreach (var number in ticket.Numbers)
+                {
+                    Assert.IsTrue(number > 0);
+                    numbers.Add(number);
+                }
+            }
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
+            int sameCount = 0;
+            int index = 0;
+            for (int i = 0; i < player.Tickets.Count; i++)
+            {
+                var ticket = player.Tickets[i];
+                foreach (var number in ticket.Numbers)
+                {
+                    if (numbers[index++] == number)
+                    {
+                        sameCount++;
+                    }
+                }
+            }
+            Assert.IsTrue(numbers.Count > sameCount);
+        }
+        [TestMethod]
+        public void TestMethodPlayerSameNumbers()
+        {
+            MainWindow window = new MainWindow();
+
+            var player = window.CreatePlayer(window.PlayerCounter++);
+            player.NumbersAmount = 12;
+            player.System = 10;
+            player.Stake = 2;
+            player.SameNumbers = true;
+            player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
+            Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
+            var random = new Random();
+
+
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+            IList<int> numbers = new List<int>();
+            foreach (var ticket in player.Tickets)
+            {
+                Assert.AreEqual(ticket.Stake, player.Stake);
+                foreach (var number in ticket.Numbers)
+                {
+                    Assert.IsTrue(number > 0);
+                    numbers.Add(number);
+                }
+            }
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
+            int sameCount = 0;
+            int index = 0;
+            for (int i = 0; i < player.Tickets.Count; i++)
+            {
+                var ticket = player.Tickets[i];
+                foreach (var number in ticket.Numbers)
+                {
+                    if (numbers[index++] == number)
+                    {
+                        sameCount++;
+                    }
+                }
+            }
+            Assert.IsTrue(numbers.Count == sameCount);
         }
 
         [TestMethod]
@@ -206,13 +296,14 @@ namespace UnitTestProject1
             player.StatRange = 8;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
+            var random = new Random();
 
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
             Assert.AreEqual(player.Tickets.Count, player.NumberOfTickets, 0, player.ToString());
 
-            Assert.AreEqual(1000 - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
-            Assert.AreEqual(1000 - player.Money, player.SpendMoney, 0, player.ToString());
+            Assert.AreEqual(MainWindow.startMoney - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
+            Assert.AreEqual(MainWindow.startMoney - player.Money, player.SpendMoney, 0, player.ToString());
 
             foreach (var ticket in player.Tickets)
             {
@@ -288,13 +379,14 @@ namespace UnitTestProject1
             player.SameNumbers = true;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
+            var random = new Random();
 
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
             Assert.AreEqual(player.Tickets.Count, player.NumberOfTickets, 0, player.ToString());
 
-            Assert.AreEqual(1000 - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
-            Assert.AreEqual(1000 - player.Money, player.SpendMoney, 0, player.ToString());
+            Assert.AreEqual(MainWindow.startMoney - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
+            Assert.AreEqual(MainWindow.startMoney - player.Money, player.SpendMoney, 0, player.ToString());
 
             Assert.IsTrue(player.Tickets.Any(x => x.Numbers.Contains(1)));
             Assert.IsTrue(player.Tickets.Any(x => x.Numbers.Contains(2)));

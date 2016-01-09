@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Serialization;
 using GreatRandom.Annotations;
+using Newtonsoft.Json;
 
 namespace GreatRandom
 {
@@ -17,12 +20,11 @@ namespace GreatRandom
     /// </summary>
     public partial class MainWindow : INotifyPropertyChanged
     {
-        static int SelectAmountMax = 15;
+        static int SelectAmountMax = 20;
         static int SystemMax = 10;
         static int SystemMin = 1;
-        private static int startMoney = 1000;
+        public static int startMoney = 1000;
         private static int MaxStake = 1;
-        private static Random random = new Random();
         private Dictionary<int, int> stakes = new Dictionary<int, int>();
         private int _numberOfGames = 0;
         private readonly Calculate _calculate;
@@ -37,8 +39,10 @@ namespace GreatRandom
         private SortableObservableCollection<Player> _dPlayers = new SortableObservableCollection<Player>();
         private SortableObservableCollection<Player> _dTopPlayers = new SortableObservableCollection<Player>();
         private bool haveChanges = true;
-        public INumbersGenerator generator = new KenoGenerator();
-        private HashSet<string> playerSignatures = new HashSet<string>(); 
+        public INumbersGenerator generator = new KenoLoader();
+        private HashSet<string> playerSignatures = new HashSet<string>();
+        private string filename = "processedplayers.txt";
+        StreamWriter writer;
         public MainWindow()
         {
             _calculate = new Calculate();
@@ -51,6 +55,8 @@ namespace GreatRandom
                 numberStatDict[i] = numberstat;
                 _numbersStatistic.Add(numberstat);
             }
+            SaveTicket = new Command<Player>(SaveClick);
+
 
             stakes.Add(1, 1);
             stakes.Add(2, 2);
@@ -59,15 +65,48 @@ namespace GreatRandom
             stakes.Add(5, 15);
 
         }
+        IList<Player> savedplayers = new List<Player>();
+        private void SaveClick(Player obj)
+        {
+            if (obj != null && !savedplayers.Contains(obj))
+                savedplayers.Add(obj);
+            else if (savedplayers.Contains(obj))
+            {
+                savedplayers.Remove(obj);
+            }
+            var stringwriter = Serialize(savedplayers);
+
+            var xml = stringwriter.ToString();
+            StreamWriter writer = new StreamWriter("saved.xml");
+            writer.Write(xml);
+            writer.Flush();
+            writer.Close();
+        }
+        public static string Serialize(object o)
+        {
+            return JsonConvert.SerializeObject(o); ;
+        }
 
         private Thread gameprocessingthread;
+        private Command<Player> _saveTicket;
+
         void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             gameprocessingthread.Abort();
+            writer.Flush();
         }
 
         void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
+            StreamReader reader = new StreamReader(filename);
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                playerSignatures.Add(line);
+            }
+            reader.Close();
+            writer = new StreamWriter(filename, true);
+
             generator.Load();
             for (int i = 0; i < 100; i++)
             {
@@ -77,31 +116,48 @@ namespace GreatRandom
                     numberStat.Appear(numbers.Contains(numberStat.Number));
                 }
             }
+
+            StreamReader sr = new StreamReader("saved.xml");
+            var str = sr.ReadToEnd();
+            sr.Close();
+            savedplayers = Deserialize<List<Player>>(str);
+            if (savedplayers == null)
+                savedplayers = new List<Player>();
+            foreach (var savedplayer in savedplayers)
+            {
+                savedplayer.Saved = true;
+                Players.Add(savedplayer);
+            }
+
             LoadStoredPlayers();
+            Players.Sort(x => x.Name, ListSortDirection.Ascending);
             for (int i = 0; Players.Count < 100; i++)
             {
                 var playernew = CreatePlayer(PlayerCounter++);
 
                 Players.Add(playernew);
-
-
             }
+
             gameprocessingthread = new Thread(ProcessGames);
             gameprocessingthread.Start();
 
         }
+        public static T Deserialize<T>(string xml)
+        {
+            return JsonConvert.DeserializeObject<T>(xml); ;
+        }
 
         private void LoadStoredPlayers()
         {
-            var playernew = new Player(8, "Loaded1", 28, 10, false, startMoney, 6, 7, 0, 11, 21, 1);
+            var playernew = new Player(11, "Loaded1", 11, 1, false, startMoney, 10, 6, 2, 12, 30, 7, new Random());
             Players.Add(playernew);
-            playernew = new Player(8, "Loaded2", 28, 5, false, startMoney, 6, 7, 0, 11, 21, 1);
+            playernew = new Player(8, "Loaded2", 28, 5, false, startMoney, 6, 7, 0, 11, 21, 1, new Random());
             Players.Add(playernew);
-            playernew = new Player(8, "Loaded3", 28, 2, false, startMoney, 6, 7, 0, 11, 21, 1);
+            playernew = new Player(8, "Loaded3", 28, 2, false, startMoney, 6, 7, 0, 11, 21, 1, new Random());
             Players.Add(playernew);
-            playernew = new Player(8, "Loaded4", 28, 1, false, startMoney, 6, 7, 0, 11, 21, 1);
+            playernew = new Player(8, "Loaded4", 28, 1, false, startMoney, 6, 7, 0, 11, 21, 1, new Random());
             Players.Add(playernew);
-            playernew = new Player(10, "Loaded4", 28, 1, false, startMoney, 9, 10, 0, 10, 0, 100);
+            playernew = new Player(10, "Loaded5", 28, 1, false, startMoney, 9, 10, 0, 10, 0, 100, new Random());
             Players.Add(playernew);
         }
 
@@ -117,8 +173,8 @@ namespace GreatRandom
 
                 SortableObservableCollection<Player> childs = new SortableObservableCollection<Player>();
                 SortableObservableCollection<Player> lostPlayers = new SortableObservableCollection<Player>();
-                                                MyThreadPool<Player>.Foreach(Players, player =>
-//                foreach (var player in Players)
+                //                                                MyThreadPool<Player>.Foreach(Players, player =>
+                foreach (var player in Players)
                 {
                     var tempStat = new SortableObservableCollection<NumberStat>();
                     if (player.ColdNumbers + player.HotNumbers > 0)
@@ -127,23 +183,37 @@ namespace GreatRandom
                         var player1 = player;
                         tempStat.Sort(x => x.TimesAppear(player1.StatRange), ListSortDirection.Descending);
                     }
-                    var random = new Random();
-                    GenerateNumbersBuyTickets(player, tempStat,random);
+                    var random = player.Random;
+                    GenerateNumbersBuyTickets(player, tempStat, random);
                     player.CurrentMinus += player.Tickets.Count * player.Stake;
                     var moneyWon = Calculate.CalculateTickets(numbers, player.Tickets);
-                    //if (moneyWon > 1000)
-                    //{
-                    //    var childsAmount = moneyWon / 10000;
-                    //    for (int j = 0; j < childsAmount && j < 10; j++)
-                    //    {
-                    //        var child = new Player(player.NumbersAmount, (counter++).ToString(),
-                    //            player.NumberOfTickets, player.Stake, player.SameNumbers, 1000, player.System,
-                    //            player.HotNumbers, player.ColdNumbers, player.HotRange, player.ColdRange,
-                    //            player.StatRange);
-                    //        childs.Add(child);
+                    if (moneyWon > 10000)
+                    {
+                        var childsAmount = moneyWon / 10000;
+                        for (int j = 0; j < childsAmount && j < 10; j++)
+                        {
+                            var child = new Player()
+                            {
+                                ColdNumbers = player.ColdNumbers,
+                                ColdRange = player.ColdRange,
+                                HotNumbers = player.HotNumbers,
+                                NumberOfTickets = player.NumberOfTickets,
+                                Stake = player.Stake,
+                                StatRange = player.StatRange,
+                                System = player.System,
+                                Random = player.Random,
+                                Money = 1000,
+                                HotRange = player.HotRange,
+                                Name = "child" + player.Name,
+                                NumbersAmount = player.NumbersAmount,
+                                SameNumbers = player.SameNumbers,
+                                Saved = player.Saved,
+                                
+                            };
+                            childs.Add(child);
 
-                    //    }
-                    //}
+                        }
+                    }
                     player.Money += moneyWon;
                     var currentMinus = moneyWon - player.CurrentMinus;
                     if (currentMinus < 0)
@@ -152,14 +222,14 @@ namespace GreatRandom
                     {
                         player.CurrentMinus = 0;
                     }
-                    if (player.CurrentMinus > startMoney)
+                    //                    if (player.CurrentMinus > startMoney)
+                    //                        lostPlayers.Add(player);
+                    if (player.Money <= 0)
                         lostPlayers.Add(player);
-//                    if (player.Money <= 0)
-//                      lostPlayers.Add(player);
 
                     player.GamesPlayed++;
-//                }
-                                });
+                }
+                //                                });
 
 
                 foreach (var numberStat in NumbersStatistic)
@@ -189,11 +259,12 @@ namespace GreatRandom
 
                 PlayerCounter = Players.Count;
                 GamesPlayed++;
-                Dispatcher.Invoke(() =>
-                {
-                    DPlayers.Sync(Players);
-                    DTopPlayers.Sync(TopPlayers);
-                });
+                if (Dispatcher.Thread.IsAlive)
+                    Dispatcher.Invoke(() =>
+                    {
+                        DPlayers.Sync(Players);
+                        DTopPlayers.Sync(TopPlayers);
+                    });
 
                 var end = DateTime.UtcNow;
                 Console.WriteLine(end - start);
@@ -212,6 +283,8 @@ namespace GreatRandom
         private int RemoveAndCreateNewPlayer(Player player, int counter)
         {
             Players.Remove(player);
+            writer.WriteLine(player.ToString());
+
             var minSpendMoney = 0;
             var lastPlayer = TopPlayers.LastOrDefault();
             if (lastPlayer != null)
@@ -237,7 +310,7 @@ namespace GreatRandom
 
         }
 
-        public void GenerateNumbersBuyTickets(Player player, SortableObservableCollection<NumberStat> stats,Random random)
+        public void GenerateNumbersBuyTickets(Player player, SortableObservableCollection<NumberStat> stats, Random random)
         {
             if (player.System != player.NumbersAmount)
             {
@@ -264,7 +337,7 @@ namespace GreatRandom
 
                         }
                     }
-                    array = GenerateRandomsArray(player.NumbersAmount, array,random);
+                    array = GenerateRandomsArray(player.NumbersAmount, array, random);
 
                     var combinations = combination(array.ToArray(), player.System).ToArray();
                     player.Tickets.Clear();
@@ -283,6 +356,9 @@ namespace GreatRandom
             }
             else
             {
+                if (!player.SameNumbers)
+                    player.Tickets.Clear();
+
                 while (player.Tickets.Count < player.NumberOfTickets)
                 {
                     var ticket = new Ticket();
@@ -305,7 +381,7 @@ namespace GreatRandom
 
                         }
                     }
-                    ticket.Numbers = GenerateRandomsArray(player.System, ticket.Numbers,random);
+                    ticket.Numbers = GenerateRandomsArray(player.System, ticket.Numbers, random);
                     player.Tickets.Add(ticket);
                 }
                 for (int j = 0; j < player.Tickets.Count; j++)
@@ -313,7 +389,7 @@ namespace GreatRandom
                     var currentTicket = player.Tickets[j];
                     if (!player.SameNumbers || currentTicket.IsWon)
                     {
-                        currentTicket.Numbers = GenerateRandomsArray(player.System, currentTicket.Numbers,random);
+                        currentTicket.Numbers = GenerateRandomsArray(player.System, currentTicket.Numbers, random);
                     }
                     currentTicket.Stake = player.Stake;
 
@@ -334,13 +410,15 @@ namespace GreatRandom
         public Player CreatePlayer(int counter)
         {
             Player playernew;
+            var random = new Random();
+
             do
             {
                 var numbersAmount = 0;
                 var system = 0;
                 long combinations = 0;
                 var stake = stakes[random.Next(1, MaxStake + 1)];
-                var statRange = random.Next(1, 100 + 1);
+                var statRange = random.Next(1, 10 + 1);
                 long ticketsAmount = 0;
                 var useSystem = random.Next(0, 2) == 1;
 
@@ -357,18 +435,18 @@ namespace GreatRandom
                         }
                         combinations = Combinations(numbersAmount, system);
 
-                    } while (combinations*stake > startMoney || combinations > 50 || numbersAmount == system);
+                    } while (combinations * stake > startMoney || combinations > 50 || numbersAmount == system);
                     ticketsAmount = combinations;
                 }
                 else
                 {
-                    while (ticketsAmount*stake > 100 || ticketsAmount < 10)
+                    while (ticketsAmount * stake > 100 || ticketsAmount < 1)
                     {
                         ticketsAmount = random.Next(1, 50 + 1);
                         stake = stakes[random.Next(1, MaxStake + 1)];
                     }
                     numbersAmount = random.Next(SystemMin, SystemMax + 1);
-                    system = (int) numbersAmount;
+                    system = (int)numbersAmount;
                 }
 
 
@@ -392,15 +470,15 @@ namespace GreatRandom
                         hotnumbers = random.Next(0, numbersAmount - coldnumbers + 1);
 
                     }
-                    hotRange = random.Next(hotnumbers, generator.Maxnumber/2 + 1);
-                    coldRange = random.Next(coldnumbers, generator.Maxnumber/2 + 1);
+                    hotRange = random.Next(hotnumbers, generator.Maxnumber / 2 + 1);
+                    coldRange = random.Next(coldnumbers, generator.Maxnumber / 2 + 1);
 
 
                 }
                 Debug.Assert(numbersAmount > 0);
                 Debug.Assert(numbersAmount >= system);
-                playernew = new Player(numbersAmount, counter++.ToString(), (int) ticketsAmount, stake,
-                    random.Next(0, 2) == 1, startMoney, system, hotnumbers, coldnumbers, hotRange, coldRange, statRange);
+                playernew = new Player(numbersAmount, counter++.ToString(), (int)ticketsAmount, stake,
+                    random.Next(0, 2) == 1, startMoney, system, hotnumbers, coldnumbers, hotRange, coldRange, statRange, random);
 
             } while (playerSignatures.Contains(playernew.ToString()));
             playerSignatures.Add(playernew.ToString());
@@ -526,6 +604,17 @@ namespace GreatRandom
         public Calculate Calculate
         {
             get { return _calculate; }
+        }
+
+        public Command<Player> SaveTicket
+        {
+            get { return _saveTicket; }
+            set
+            {
+                if (Equals(value, _saveTicket)) return;
+                _saveTicket = value;
+                OnPropertyChanged();
+            }
         }
 
 

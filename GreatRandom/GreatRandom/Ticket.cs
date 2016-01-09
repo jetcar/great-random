@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Threading;
+using System.Xml.Serialization;
 using GreatRandom.Annotations;
 
 namespace GreatRandom
@@ -25,6 +26,7 @@ namespace GreatRandom
             set { _numbers = value; }
         }
 
+        [XmlIgnore]
         public int WonAmount
         {
             get { return _wonAmount; }
@@ -35,6 +37,7 @@ namespace GreatRandom
             }
         }
 
+        [XmlIgnore]
         public int Stake
         {
             get { return _stake; }
@@ -44,7 +47,7 @@ namespace GreatRandom
                 _stake = value;
             }
         }
-
+        [XmlIgnore]
         public bool IsWon { get; set; }
 
     }

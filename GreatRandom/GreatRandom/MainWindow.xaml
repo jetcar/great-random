@@ -6,7 +6,7 @@
         Width="925"
         Height="650"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    <Grid>
+    <Grid Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -99,6 +99,7 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="{Binding Name}" />
                         <Label Grid.Column="1" Content="{Binding Money}" />
@@ -119,6 +120,12 @@
                         <ToggleButton Grid.Column="16"
                                       Content="+"
                                       IsChecked="{Binding ShowTickets}" />
+                        <ToggleButton Grid.Column="17"
+                                      Command="{Binding ElementName=MainGrid,
+                                                        Path=DataContext.SaveTicket}"
+                                      CommandParameter="{Binding}"
+                                      Content="save"
+                                      IsChecked="{Binding Saved}" />
                         <ListView Grid.Row="1"
                                   Grid.ColumnSpan="16"
                                   ItemsSource="{Binding Tickets}"

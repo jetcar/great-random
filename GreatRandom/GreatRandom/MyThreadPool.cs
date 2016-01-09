@@ -21,7 +21,7 @@ namespace GreatRandom
         {
             if (myThreads.Count == 0)
             {
-                for (int i = 0; i < Environment.ProcessorCount - 1; i++)
+                for (int i = 0; i < Environment.ProcessorCount; i++)
                 {
                     var thread = new Thread(ProcessThreadQueue);
                     var wrapper = new ThreadWrapper() { Thread = thread, Id = counter++ };
