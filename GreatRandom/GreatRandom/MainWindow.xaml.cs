@@ -7,9 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Xml.Serialization;
 using GreatRandom.Annotations;
 using Newtonsoft.Json;
 
@@ -39,7 +36,8 @@ namespace GreatRandom
         private SortableObservableCollection<Player> _dPlayers = new SortableObservableCollection<Player>();
         private SortableObservableCollection<Player> _dTopPlayers = new SortableObservableCollection<Player>();
         private bool haveChanges = true;
-        public INumbersGenerator generator = new KenoLoader();
+//        public INumbersGenerator generator = new KenoLoader();
+        public INumbersGenerator generator = new KenoGenerator();
         private HashSet<string> playerSignatures = new HashSet<string>();
         private string filename = "processedplayers.txt";
         StreamWriter writer;
@@ -55,8 +53,8 @@ namespace GreatRandom
                 numberStatDict[i] = numberstat;
                 _numbersStatistic.Add(numberstat);
             }
-            SaveTicket = new Command<Player>(SaveClick);
-
+            SavePlayer = new Command<Player>(SaveClick);
+            KillCommand = new Command<Player>(KillPlayer);
 
             stakes.Add(1, 1);
             stakes.Add(2, 2);
@@ -65,6 +63,12 @@ namespace GreatRandom
             stakes.Add(5, 15);
 
         }
+
+        private void KillPlayer(Player obj)
+        {
+            obj.Money = 0;
+        }
+
         IList<Player> savedplayers = new List<Player>();
         private void SaveClick(Player obj)
         {
@@ -88,12 +92,21 @@ namespace GreatRandom
         }
 
         private Thread gameprocessingthread;
-        private Command<Player> _saveTicket;
+        private Command<Player> _savePlayer;
+        private Command<Player> _killCommand;
 
         void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             gameprocessingthread.Abort();
             writer.Flush();
+
+            var stringwriter = Serialize(savedplayers);
+
+            var xml = stringwriter.ToString();
+            StreamWriter writer2 = new StreamWriter("saved.xml");
+            writer2.Write(xml);
+            writer2.Flush();
+            writer2.Close();
         }
 
         void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
@@ -149,15 +162,7 @@ namespace GreatRandom
 
         private void LoadStoredPlayers()
         {
-            var playernew = new Player(11, "Loaded1", 11, 1, false, startMoney, 10, 6, 2, 12, 30, 7, new Random());
-            Players.Add(playernew);
-            playernew = new Player(8, "Loaded2", 28, 5, false, startMoney, 6, 7, 0, 11, 21, 1, new Random());
-            Players.Add(playernew);
-            playernew = new Player(8, "Loaded3", 28, 2, false, startMoney, 6, 7, 0, 11, 21, 1, new Random());
-            Players.Add(playernew);
-            playernew = new Player(8, "Loaded4", 28, 1, false, startMoney, 6, 7, 0, 11, 21, 1, new Random());
-            Players.Add(playernew);
-            playernew = new Player(10, "Loaded5", 28, 1, false, startMoney, 9, 10, 0, 10, 0, 100, new Random());
+            var playernew = new Player() { NumbersAmount = 11, Name = "Loaded1", NumberOfTickets = 11, Stake = 1, SameNumbers = false, Money = startMoney, System = 10, HotNumbers = 6, ColdNumbers = 2, HotRange = 12, ColdRange = 30, StatRange = 7, Random = new Random() };
             Players.Add(playernew);
         }
 
@@ -171,9 +176,8 @@ namespace GreatRandom
                 var numbers = generator.Generate();
 
 
-                SortableObservableCollection<Player> childs = new SortableObservableCollection<Player>();
                 SortableObservableCollection<Player> lostPlayers = new SortableObservableCollection<Player>();
-                //                                                MyThreadPool<Player>.Foreach(Players, player =>
+                //MyThreadPool<Player>.Foreach(Players, player =>
                 foreach (var player in Players)
                 {
                     var tempStat = new SortableObservableCollection<NumberStat>();
@@ -187,33 +191,7 @@ namespace GreatRandom
                     GenerateNumbersBuyTickets(player, tempStat, random);
                     player.CurrentMinus += player.Tickets.Count * player.Stake;
                     var moneyWon = Calculate.CalculateTickets(numbers, player.Tickets);
-                    if (moneyWon > 10000)
-                    {
-                        var childsAmount = moneyWon / 10000;
-                        for (int j = 0; j < childsAmount && j < 10; j++)
-                        {
-                            var child = new Player()
-                            {
-                                ColdNumbers = player.ColdNumbers,
-                                ColdRange = player.ColdRange,
-                                HotNumbers = player.HotNumbers,
-                                NumberOfTickets = player.NumberOfTickets,
-                                Stake = player.Stake,
-                                StatRange = player.StatRange,
-                                System = player.System,
-                                Random = player.Random,
-                                Money = 1000,
-                                HotRange = player.HotRange,
-                                Name = "child" + player.Name,
-                                NumbersAmount = player.NumbersAmount,
-                                SameNumbers = player.SameNumbers,
-                                Saved = player.Saved,
-                                
-                            };
-                            childs.Add(child);
 
-                        }
-                    }
                     player.Money += moneyWon;
                     var currentMinus = moneyWon - player.CurrentMinus;
                     if (currentMinus < 0)
@@ -229,7 +207,7 @@ namespace GreatRandom
 
                     player.GamesPlayed++;
                 }
-                //                                });
+                //});
 
 
                 foreach (var numberStat in NumbersStatistic)
@@ -242,23 +220,76 @@ namespace GreatRandom
                     counter = RemoveAndCreateNewPlayer(player, counter);
                 }
 
-                foreach (var child in childs)
+                foreach (var player in Players)
                 {
-                    Players.Add(child);
+                    player.CallNotifyPropretyChanged();
                 }
-                for (int index = Players.Count; index < 2000; index++)
+                GamesPlayed++;
+                if (GamesPlayed % 100 == 0)
                 {
-                    var player = CreatePlayer(counter++);
-                    Players.Add(player);
+                    var topPlayers = new SortableObservableCollection<Player>();
+                    Players.Sort(x => x.Money, ListSortDirection.Descending);
+
+                    for (int i = 0; i < Players.Count; i++)
+                    {
+                        if (Players[i].Money > startMoney)
+                        {
+                            topPlayers.Add(Players[i]);
+                        }
+                    }
+                    var random = new Random();
+                    for (int i = 0; i < topPlayers.Count; i++)
+                    {
+                        var pl1 = topPlayers[i];
+                        for (int j = 0; j < topPlayers.Count; j++)
+                        {
+                            var pl2 = topPlayers[j];
+                            var enum1 = pl1.Properties.GetEnumerator();
+                            enum1.MoveNext();
+                            var enum2 = pl2.Properties.GetEnumerator();
+                            enum2.MoveNext();
+                            if (i != j)
+                            {
+                                var child = new Player();
+                                child.Money = startMoney;
+                                child.Name = "child" + counter;
+                                for (int k = 0; k < child.Properties.Count; k++)
+                                {
+                                    var prop1 = enum1.Current;
+                                    var prop2 = enum2.Current;
+                                    var usepl2 = random.Next(0, 2) == 1;
+                                    if (usepl2)
+                                    {
+                                        child.GetProperty(prop2.Key).IntValue = prop2.Value.IntValue;
+                                        child.GetProperty(prop2.Key).BoolValue = prop2.Value.BoolValue;
+                                        child.GetProperty(prop2.Key).StrValue = prop2.Value.StrValue;
+                                    }
+                                    else
+                                    {
+                                        child.GetProperty(prop1.Key).IntValue = prop1.Value.IntValue;
+                                        child.GetProperty(prop1.Key).BoolValue = prop1.Value.BoolValue;
+                                        child.GetProperty(prop1.Key).StrValue = prop1.Value.StrValue;
+                                    }
+                                    enum1.MoveNext();
+                                    enum2.MoveNext();
+                                }
+
+                            }
+                        }
+                    }
+                    for (int index = Players.Count; index < 2000; index++)
+                    {
+                        var player = CreatePlayer(counter++);
+                        Players.Add(player);
+                    }
+
                 }
 
                 while (Players.Count > 2000)
                 {
                     Players.RemoveAt(Players.Count - 1);
                 }
-
                 PlayerCounter = Players.Count;
-                GamesPlayed++;
                 if (Dispatcher.Thread.IsAlive)
                     Dispatcher.Invoke(() =>
                     {
@@ -284,6 +315,7 @@ namespace GreatRandom
         {
             Players.Remove(player);
             writer.WriteLine(player.ToString());
+            savedplayers.Remove(player);
 
             var minSpendMoney = 0;
             var lastPlayer = TopPlayers.LastOrDefault();
@@ -411,6 +443,8 @@ namespace GreatRandom
         {
             Player playernew;
             var random = new Random();
+            var seed = random.Next();
+            random = new Random(seed);
 
             do
             {
@@ -477,8 +511,23 @@ namespace GreatRandom
                 }
                 Debug.Assert(numbersAmount > 0);
                 Debug.Assert(numbersAmount >= system);
-                playernew = new Player(numbersAmount, counter++.ToString(), (int)ticketsAmount, stake,
-                    random.Next(0, 2) == 1, startMoney, system, hotnumbers, coldnumbers, hotRange, coldRange, statRange, random);
+                playernew = new Player()
+                {
+                    NumbersAmount = numbersAmount,
+                    Name = counter++.ToString(),
+                    NumberOfTickets = (int)ticketsAmount,
+                    Stake = stake,
+                    SameNumbers = random.Next(0, 2) == 1,
+                    Money = startMoney,
+                    System = system,
+                    HotNumbers = hotnumbers,
+                    ColdNumbers = coldnumbers,
+                    HotRange = hotRange,
+                    ColdRange = coldRange,
+                    StatRange = statRange,
+                    Seed = seed,
+                    Random = random
+                };
 
             } while (playerSignatures.Contains(playernew.ToString()));
             playerSignatures.Add(playernew.ToString());
@@ -606,13 +655,24 @@ namespace GreatRandom
             get { return _calculate; }
         }
 
-        public Command<Player> SaveTicket
+        public Command<Player> KillCommand
         {
-            get { return _saveTicket; }
+            get { return _killCommand; }
             set
             {
-                if (Equals(value, _saveTicket)) return;
-                _saveTicket = value;
+                if (Equals(value, _killCommand)) return;
+                _killCommand = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Command<Player> SavePlayer
+        {
+            get { return _savePlayer; }
+            set
+            {
+                if (Equals(value, _savePlayer)) return;
+                _savePlayer = value;
                 OnPropertyChanged();
             }
         }

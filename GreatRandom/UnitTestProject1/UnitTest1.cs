@@ -31,7 +31,7 @@ namespace UnitTestProject1
                     Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, player.ToString());
                 //Assert.AreEqual((window.PlayerCounter).ToString(), player.Name);
 
-                window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+                window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
                 foreach (var ticket in player.Tickets)
                 {
                     Assert.AreEqual(ticket.Stake, player.Stake);
@@ -57,7 +57,7 @@ namespace UnitTestProject1
             MainWindow window = new MainWindow();
             var random = new Random();
             HashSet<int> arrayinput = new HashSet<int>();
-            var array = window.GenerateRandomsArray(6,arrayinput,random);
+            var array = window.GenerateRandomsArray(6, arrayinput, random);
             int[] byteArray = new int[6];
             array.CopyTo(byteArray);
             Assert.AreEqual((int)MainWindow.Combinations(6, 2), MainWindow.combination(byteArray, 2).ToArray().Length);
@@ -74,7 +74,7 @@ namespace UnitTestProject1
             var generator = (KenoLoader)window.generator;
             generator.Path = "test.xml";
             generator.Load();
-            var player = new Player(8, "Loaded4", 28, 1, false, 100, 6, 7, 0, 11, 21, 1,new Random() );
+            var player = new Player() { NumbersAmount = 8, Name = "Loaded4", NumberOfTickets = 28, Stake = 1, SameNumbers = false, Money = 100, System = 6, HotNumbers = 7, ColdNumbers = 0, HotRange = 11, ColdRange = 21, StatRange = 1, Random = new Random() };
 
             for (int i = 7800; i < generator.results.Count; i++)
             {
@@ -87,13 +87,13 @@ namespace UnitTestProject1
                 tempStat.Sync(window.NumbersStatistic);
                 tempStat.Sort(x => x.TimesAppear(player.StatRange), ListSortDirection.Descending);
 
-                window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+                window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
                 var wonMoney = Calculate.CalculateTickets(numbers, player.Tickets);
                 Console.WriteLine(wonMoney);
 
 
             }
-            
+
 
             //foreach (var ticket in player.Tickets)
             //{
@@ -105,7 +105,7 @@ namespace UnitTestProject1
             //}
             Console.WriteLine();
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
 
             foreach (var ticket in player.Tickets)
             {
@@ -133,7 +133,7 @@ namespace UnitTestProject1
             var random = new Random();
 
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
             Assert.AreEqual(player.Tickets.Count, player.NumberOfTickets, 0, player.ToString());
 
             Assert.AreEqual(MainWindow.startMoney - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
@@ -165,7 +165,7 @@ namespace UnitTestProject1
             var random = new Random();
 
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
             IList<int> numbers = new List<int>();
             foreach (var ticket in player.Tickets)
             {
@@ -207,7 +207,7 @@ namespace UnitTestProject1
             var random = new Random();
 
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
             IList<int> numbers = new List<int>();
             foreach (var ticket in player.Tickets)
             {
@@ -299,7 +299,7 @@ namespace UnitTestProject1
             var random = new Random();
 
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
             Assert.AreEqual(player.Tickets.Count, player.NumberOfTickets, 0, player.ToString());
 
             Assert.AreEqual(MainWindow.startMoney - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());
@@ -382,7 +382,7 @@ namespace UnitTestProject1
             var random = new Random();
 
 
-            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic,random);
+            window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
             Assert.AreEqual(player.Tickets.Count, player.NumberOfTickets, 0, player.ToString());
 
             Assert.AreEqual(MainWindow.startMoney - player.Money, player.NumberOfTickets * player.Stake, 0, player.ToString());

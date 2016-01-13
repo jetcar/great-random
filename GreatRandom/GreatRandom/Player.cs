@@ -12,50 +12,48 @@ using Newtonsoft.Json;
 
 namespace GreatRandom
 {
-    public class Player : INotifyPropertyChanged
+    public class Player : BaseModel, INotifyPropertyChanged
     {
-        private int _numberOfTickets;
-        private int _numbersAmount;
-        private bool _sameNumbers;
-        private int _stake;
-        private int _money;
-        private string _name;
         private IList<Ticket> _tickets = new List<Ticket>();
         private int _gamesPlayed;
         private int _spendMoney;
-        private int _system;
-        private int _hotNumbers;
-        private int _coldNumbers;
         private int _currentMinus;
         private int _biggestMinus;
-        private int _coldRange;
-        private int _hotRange;
-        private int _statRange;
         private bool _showTickets;
         private Visibility _showTicketsVisibility = Visibility.Collapsed;
         private Random _random;
         private bool _saved;
+        private string _name;
+        private Property _coldRange;
+        private Property _hotRange;
+        private Property _hotNumbers;
+        private Property _coldNumbers;
+        private Property _numberOfTickets;
+        private Property _numbersAmount;
+        private Property _sameNumbers;
+        private Property _stake;
+        private Property _money;
+        private Property _statRange;
+        private Property _system;
+        private Property _seed;
 
         public Player()
         {
             Random = new Random();
+            _coldRange = GetProperty("ColdRange");
+            _hotRange = GetProperty("HotRange");
+            _coldNumbers = GetProperty("ColdNumbers");
+            _hotNumbers = GetProperty("HotNumbers");
+            _numbersAmount = GetProperty("NumbersAmount");
+            _numberOfTickets = GetProperty("NumberOfTickets");
+            _sameNumbers = GetProperty("SameNumbers");
+            _stake = GetProperty("Stake");
+            _money = GetProperty("Money");
+            _statRange = GetProperty("StatRange");
+            _system = GetProperty("System");
+            _seed = GetProperty("Seed");
         }
-        public Player(int numbersAmount, string name, int ticketAmount, int stake, bool sameNumbers, int money, int system, int hotnumbers, int coldnumbers, int hotRange, int coldRange,int statRange, Random random)
-        {
-            NumbersAmount = numbersAmount;
-            Name = name;
-            NumberOfTickets = ticketAmount;
-            Stake = stake;
-            SameNumbers = sameNumbers;
-            Money = money;
-            System = system;
-            HotNumbers = hotnumbers;
-            ColdNumbers = coldnumbers;
-            HotRange = hotRange;
-            ColdRange = coldRange;
-            StatRange = statRange;
-            Random = random;
-        }
+
         [JsonIgnoreAttribute]
         public Random Random
         {
@@ -108,46 +106,44 @@ namespace GreatRandom
         [JsonProperty]
         public int ColdRange
         {
-            get { return _coldRange; }
+            get { return _coldRange.IntValue; }
             set
             {
-                if (value == _coldRange) return;
-                _coldRange = value;
-                OnPropertyChanged();
+                if (value == _coldRange.IntValue) return;
+                _coldRange.IntValue = value;
             }
         }
+
+
         [JsonProperty]
         public int HotRange
         {
-            get { return _hotRange; }
+            get { return _hotRange.IntValue; }
             set
             {
-                if (value == _hotRange) return;
-                _hotRange = value;
-                OnPropertyChanged();
+                if (value == _hotRange.IntValue) return;
+                _hotRange.IntValue = value;
             }
         }
 
         [JsonProperty]
         public int HotNumbers
         {
-            get { return _hotNumbers; }
+            get { return _hotNumbers.IntValue; }
             set
             {
-                if (value == _hotNumbers) return;
-                _hotNumbers = value;
-                OnPropertyChanged();
+                if (value == _hotNumbers.IntValue) return;
+                _hotNumbers.IntValue = value;
             }
         }
         [JsonProperty]
         public int ColdNumbers
         {
-            get { return _coldNumbers; }
+            get { return _coldNumbers.IntValue; }
             set
             {
-                if (value == _coldNumbers) return;
-                _coldNumbers = value;
-                OnPropertyChanged();
+                if (value == _coldNumbers.IntValue) return;
+                _coldNumbers.IntValue = value;
             }
         }
         [JsonProperty]
@@ -158,7 +154,6 @@ namespace GreatRandom
             {
                 if (value == _gamesPlayed) return;
                 _gamesPlayed = value;
-                OnPropertyChanged();
             }
         }
         [JsonIgnoreAttribute]
@@ -169,73 +164,68 @@ namespace GreatRandom
             {
                 if (Equals(value, _tickets)) return;
                 _tickets = value;
-                OnPropertyChanged();
             }
         }
+
         [JsonProperty]
         public string Name
         {
             get { return _name; }
-            set
+            set 
             {
                 if (value == _name) return;
                 _name = value;
-                OnPropertyChanged();
             }
         }
+
         [JsonProperty]
         public int NumberOfTickets
         {
-            get { return _numberOfTickets; }
+            get { return _numberOfTickets.IntValue; }
             set
             {
-                if (value == _numberOfTickets) return;
-                _numberOfTickets = value;
-                OnPropertyChanged();
+                if (value == _numberOfTickets.IntValue) return;
+                _numberOfTickets.IntValue = value;
             }
         }
         [JsonProperty]
         public int NumbersAmount
         {
-            get { return _numbersAmount; }
+            get { return _numbersAmount.IntValue; }
             set
             {
-                if (value == _numbersAmount) return;
-                _numbersAmount = value;
-                OnPropertyChanged();
+                if (value == _numbersAmount.IntValue) return;
+                _numbersAmount.IntValue = value;
             }
         }
         [JsonProperty]
         public bool SameNumbers
         {
-            get { return _sameNumbers; }
+            get { return _sameNumbers.BoolValue; }
             set
             {
-                if (value == _sameNumbers) return;
-                _sameNumbers = value;
-                OnPropertyChanged();
+                if (value == _sameNumbers.BoolValue) return;
+                _sameNumbers.BoolValue = value;
             }
         }
         [JsonProperty]
         public int Stake
         {
-            get { return _stake; }
+            get { return _stake.IntValue; }
             set
             {
-                if (value == _stake) return;
-                _stake = value;
-                OnPropertyChanged();
+                if (value == _stake.IntValue) return;
+                _stake.IntValue = value;
             }
         }
         [JsonProperty]
         public int Money
         {
-            get { return _money; }
+            get { return _money.IntValue; }
             set
             {
-                if (value == _money) return;
-                _money = value;
-                OnPropertyChanged();
+                if (value == _money.IntValue) return;
+                _money.IntValue = value;
             }
         }
 
@@ -247,18 +237,16 @@ namespace GreatRandom
             {
                 if (value == _spendMoney) return;
                 _spendMoney = value;
-                OnPropertyChanged();
             }
         }
         [JsonProperty]
         public int System
         {
-            get { return _system; }
+            get { return _system.IntValue; }
             set
             {
-                if (value == _system) return;
-                _system = value;
-                OnPropertyChanged();
+                if (value == _system.IntValue) return;
+                _system.IntValue = value;
             }
         }
 
@@ -270,7 +258,6 @@ namespace GreatRandom
             {
                 if (value == _biggestMinus) return;
                 _biggestMinus = value;
-                OnPropertyChanged();
             }
         }
         [JsonIgnoreAttribute]
@@ -283,24 +270,32 @@ namespace GreatRandom
                 _currentMinus = value;
                 if (_currentMinus > BiggestMinus)
                     BiggestMinus = _currentMinus;
-                OnPropertyChanged();
             }
         }
         [JsonProperty]
         public int StatRange
         {
-            get { return _statRange; }
+            get { return _statRange.IntValue; }
             set
             {
-                if (value == _statRange) return;
-                _statRange = value;
-                OnPropertyChanged();
+                if (value == _statRange.IntValue) return;
+                _statRange.IntValue = value;
+            }
+        }
+        [JsonProperty]
+        public int Seed
+        {
+            get { return _seed.IntValue; }
+            set
+            {
+                if (value == _seed.IntValue) return;
+                _seed.IntValue = value;
             }
         }
 
         public override string ToString()
         {
-            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}", NumberOfTickets, SameNumbers, NumbersAmount, GamesPlayed, Stake, System,ColdNumbers,ColdRange,HotNumbers,HotRange,StatRange,System);
+            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}", NumberOfTickets, SameNumbers, NumbersAmount, GamesPlayed, Stake, System, ColdNumbers, ColdRange, HotNumbers, HotRange, StatRange, System);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -309,12 +304,51 @@ namespace GreatRandom
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var handler = PropertyChanged;
-            if (handler != null) 
+            if (handler != null)
                 handler(this, new PropertyChangedEventArgs(propertyName));
             else
             {
-                
+
             }
         }
+
+        public void CallNotifyPropretyChanged()
+        {
+            OnPropertyChanged("SpendMoney");
+            OnPropertyChanged("Money");
+            OnPropertyChanged("BiggestMinus");
+            OnPropertyChanged("CurrentMinus");
+            OnPropertyChanged("GamesPlayed");
+            OnPropertyChanged("Tickets");
+        }
+    }
+
+    public class BaseModel
+    {
+        private IDictionary<string, Property> _properties = new Dictionary<string, Property>();
+
+        public IDictionary<string, Property> Properties
+        {
+            get { return _properties; }
+            set { _properties = value; }
+        }
+
+        public Property CreateProperty(string name)
+        {
+            var property = new Property();
+            Properties.Add(name, property);
+            return property;
+        }
+
+        public Property GetProperty(string name)
+        {
+            if (Properties.ContainsKey(name))
+            {
+                return Properties[name];
+            }
+            return CreateProperty(name);
+        }
+
+        
     }
 }

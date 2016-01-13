@@ -12,45 +12,15 @@ namespace GreatRandom
     public class SortableObservableCollection<T> : ObservableCollection<T>
     {
 
-        public object locker = new object();
 
         
-        protected override void InsertItem(int index, T item)
-        {
-            lock (locker)
-                base.InsertItem(index, item);
-        }
-
-        protected override void MoveItem(int oldIndex, int newIndex)
-        {
-            lock (locker)
-                base.MoveItem(oldIndex, newIndex);
-        }
-
-        protected override void RemoveItem(int index)
-        {
-            lock (locker)
-                base.RemoveItem(index);
-        }
-
-        protected override void ClearItems()
-        {
-            lock (locker)
-                base.ClearItems();
-        }
-
-        protected override void SetItem(int index, T item)
-        {
-            lock (locker)
-                base.SetItem(index, item);
-        }
+       
 
 
        
 
         public void Sort<TKey>(Func<T, TKey> keySelector, System.ComponentModel.ListSortDirection direction)
         {
-            lock (locker)
             {
                 switch (direction)
                 {
@@ -70,7 +40,6 @@ namespace GreatRandom
 
         public void Sort<TKey>(Func<T, TKey> keySelector, IComparer<TKey> comparer)
         {
-            lock (locker)
             {
                 ApplySort(Items.OrderBy(keySelector, comparer));
             }
@@ -90,9 +59,7 @@ namespace GreatRandom
 
         public void Sync(SortableObservableCollection<T> list)
         {
-            lock (locker)
             {
-                lock (list.locker)
                 {
                     var firstCount = list.Count;
                     for (int j = 0; j < list.Count; j++)

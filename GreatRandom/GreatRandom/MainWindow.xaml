@@ -40,6 +40,9 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition Width="10" />
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Name" />
             <Label Grid.Column="1" Content="Money" />
@@ -58,6 +61,7 @@
             <Label Grid.Column="14" Content="cold range" />
             <Label Grid.Column="15" Content="stat range" />
             <Label Grid.Column="16" Content="tickets" />
+            <Label Grid.Column="17" Content="save" />
         </Grid>
         <ListView Grid.Row="2"
                   HorizontalAlignment="Stretch"
@@ -100,6 +104,7 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="{Binding Name}" />
                         <Label Grid.Column="1" Content="{Binding Money}" />
@@ -120,12 +125,17 @@
                         <ToggleButton Grid.Column="16"
                                       Content="+"
                                       IsChecked="{Binding ShowTickets}" />
-                        <ToggleButton Grid.Column="17"
+                        <CheckBox Grid.Column="17"
                                       Command="{Binding ElementName=MainGrid,
-                                                        Path=DataContext.SaveTicket}"
+                                                        Path=DataContext.SavePlayer}"
                                       CommandParameter="{Binding}"
                                       Content="save"
                                       IsChecked="{Binding Saved}" />
+                        <Button Grid.Column="18"
+                                Command="{Binding ElementName=MainGrid,
+                                                  Path=DataContext.KillCommand}"
+                                CommandParameter="{Binding}"
+                                Content="Kill" />
                         <ListView Grid.Row="1"
                                   Grid.ColumnSpan="16"
                                   ItemsSource="{Binding Tickets}"
@@ -169,6 +179,8 @@
                 <DataTemplate DataType="greatRandom:Player">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />

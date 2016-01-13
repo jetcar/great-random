@@ -67,6 +67,7 @@
     <Compile Include="MyThreadPool.cs" />
     <Compile Include="NumberStat.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="Property.cs" />
     <Compile Include="SortableObservableCollection.cs" />
     <Compile Include="Ticket.cs" />
     <Page Include="MainWindow.xaml">
