@@ -252,7 +252,7 @@ namespace GreatRandom
                             {
                                 var child = new Player();
                                 child.Money = startMoney;
-                                child.Name = "child" + counter;
+                                child.Name = "c" + counter;
                                 for (int k = 0; k < child.Properties.Count; k++)
                                 {
                                     var prop1 = enum1.Current;
@@ -274,8 +274,20 @@ namespace GreatRandom
                                     enum2.MoveNext();
                                 }
 
+                                child.HotRange = child.Random.Next(child.HotNumbers, generator.Maxnumber / 2 + 1);
+                                child.ColdRange = child.Random.Next(child.ColdNumbers, generator.Maxnumber / 2 + 1);
+                                child.System = child.Random.Next(1, child.NumbersAmount + 1);
+                                Debug.Assert(child.HotRange >= child.HotNumbers);
+                                Debug.Assert(child.ColdRange >= child.ColdNumbers);
+                                Players.Add(child);
+                                if (Players.Count > 2000)
+                                    break;
+
                             }
                         }
+                        if (Players.Count > 2000)
+                            break;
+
                     }
                     for (int index = Players.Count; index < 2000; index++)
                     {
@@ -443,8 +455,6 @@ namespace GreatRandom
         {
             Player playernew;
             var random = new Random();
-            var seed = random.Next();
-            random = new Random(seed);
 
             do
             {
@@ -525,7 +535,6 @@ namespace GreatRandom
                     HotRange = hotRange,
                     ColdRange = coldRange,
                     StatRange = statRange,
-                    Seed = seed,
                     Random = random
                 };
 

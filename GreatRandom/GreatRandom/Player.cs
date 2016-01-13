@@ -24,6 +24,7 @@ namespace GreatRandom
         private Random _random;
         private bool _saved;
         private string _name;
+        private int _money;
         private Property _coldRange;
         private Property _hotRange;
         private Property _hotNumbers;
@@ -32,10 +33,8 @@ namespace GreatRandom
         private Property _numbersAmount;
         private Property _sameNumbers;
         private Property _stake;
-        private Property _money;
         private Property _statRange;
         private Property _system;
-        private Property _seed;
 
         public Player()
         {
@@ -48,10 +47,8 @@ namespace GreatRandom
             _numberOfTickets = GetProperty("NumberOfTickets");
             _sameNumbers = GetProperty("SameNumbers");
             _stake = GetProperty("Stake");
-            _money = GetProperty("Money");
             _statRange = GetProperty("StatRange");
             _system = GetProperty("System");
-            _seed = GetProperty("Seed");
         }
 
         [JsonIgnoreAttribute]
@@ -221,11 +218,11 @@ namespace GreatRandom
         [JsonProperty]
         public int Money
         {
-            get { return _money.IntValue; }
+            get { return _money; }
             set
             {
-                if (value == _money.IntValue) return;
-                _money.IntValue = value;
+                if (value == _money) return;
+                _money = value;
             }
         }
 
@@ -282,16 +279,7 @@ namespace GreatRandom
                 _statRange.IntValue = value;
             }
         }
-        [JsonProperty]
-        public int Seed
-        {
-            get { return _seed.IntValue; }
-            set
-            {
-                if (value == _seed.IntValue) return;
-                _seed.IntValue = value;
-            }
-        }
+
 
         public override string ToString()
         {
