@@ -38,7 +38,6 @@ namespace GreatRandom
 
         public Player()
         {
-            Random = new Random();
             _coldRange = GetProperty("ColdRange");
             _hotRange = GetProperty("HotRange");
             _coldNumbers = GetProperty("ColdNumbers");
@@ -51,12 +50,7 @@ namespace GreatRandom
             _system = GetProperty("System");
         }
 
-        [JsonIgnoreAttribute]
-        public Random Random
-        {
-            get { return _random; }
-            set { _random = value; }
-        }
+
 
         [JsonIgnoreAttribute]
         public Visibility ShowTicketsVisibility
@@ -151,6 +145,7 @@ namespace GreatRandom
             {
                 if (value == _gamesPlayed) return;
                 _gamesPlayed = value;
+                OnPropertyChanged();
             }
         }
         [JsonIgnoreAttribute]
@@ -223,6 +218,7 @@ namespace GreatRandom
             {
                 if (value == _money) return;
                 _money = value;
+                OnPropertyChanged();
             }
         }
 
@@ -234,6 +230,7 @@ namespace GreatRandom
             {
                 if (value == _spendMoney) return;
                 _spendMoney = value;
+                OnPropertyChanged();
             }
         }
         [JsonProperty]
@@ -255,6 +252,7 @@ namespace GreatRandom
             {
                 if (value == _biggestMinus) return;
                 _biggestMinus = value;
+                OnPropertyChanged();
             }
         }
         [JsonIgnoreAttribute]
@@ -267,6 +265,7 @@ namespace GreatRandom
                 _currentMinus = value;
                 if (_currentMinus > BiggestMinus)
                     BiggestMinus = _currentMinus;
+                OnPropertyChanged();
             }
         }
         [JsonProperty]
@@ -279,6 +278,8 @@ namespace GreatRandom
                 _statRange.IntValue = value;
             }
         }
+        [JsonIgnoreAttribute]
+        public Random Random { get; set; }
 
 
         public override string ToString()
@@ -300,15 +301,6 @@ namespace GreatRandom
             }
         }
 
-        public void CallNotifyPropretyChanged()
-        {
-            OnPropertyChanged("SpendMoney");
-            OnPropertyChanged("Money");
-            OnPropertyChanged("BiggestMinus");
-            OnPropertyChanged("CurrentMinus");
-            OnPropertyChanged("GamesPlayed");
-            OnPropertyChanged("Tickets");
-        }
     }
 
     public class BaseModel

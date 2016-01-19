@@ -17,6 +17,12 @@ namespace GreatRandom
         private int _currentIndex = 0;
         public int Maxnumber { get { return 64; } }
         public bool HaveNext { get { return CurrentIndex < results.Count - 1; } }
+
+        public bool isLast
+        {
+            get { return CurrentIndex == results.Count - 2; }
+        }
+
         public ObservableCollection<Result> results { get; set; }
 
         public int CurrentIndex

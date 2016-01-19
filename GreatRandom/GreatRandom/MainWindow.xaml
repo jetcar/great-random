@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:greatRandom="clr-namespace:GreatRandom"
         Title="MainWindow"
-        Width="925"
+        Width="1025"
         Height="650"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid Name="MainGrid">
@@ -107,8 +107,12 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="{Binding Name}" />
-                        <Label Grid.Column="1" Content="{Binding Money}" />
-                        <Label Grid.Column="2" Content="{Binding GamesPlayed}" />
+                        <Label Grid.Column="1"
+                               HorizontalAlignment="Right"
+                               Content="{Binding Money}" />
+                        <Label Grid.Column="2"
+                               HorizontalAlignment="Right"
+                               Content="{Binding GamesPlayed}" />
                         <Label Grid.Column="3" Content="{Binding Stake}" />
                         <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
                         <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
@@ -116,9 +120,18 @@
                         <Label Grid.Column="7" Content="{Binding System}" />
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />
                         <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
-                        <Label Grid.Column="10" Content="{Binding SpendMoney, StringFormat={}{0:C}}" />
-                        <Label Grid.Column="11" Content="{Binding CurrentMinus, StringFormat={}{0:C}}" />
-                        <Label Grid.Column="12" Content="{Binding BiggestMinus, StringFormat={}{0:C}}" />
+                        <Label Grid.Column="10"
+                               HorizontalAlignment="Right"
+                               Content="{Binding SpendMoney,
+                                                 StringFormat={}{0:C}}" />
+                        <Label Grid.Column="11"
+                               HorizontalAlignment="Right"
+                               Content="{Binding CurrentMinus,
+                                                 StringFormat={}{0:C}}" />
+                        <Label Grid.Column="12"
+                               HorizontalAlignment="Right"
+                               Content="{Binding BiggestMinus,
+                                                 StringFormat={}{0:C}}" />
                         <Label Grid.Column="13" Content="{Binding HotRange}" />
                         <Label Grid.Column="14" Content="{Binding ColdRange}" />
                         <Label Grid.Column="15" Content="{Binding StatRange}" />
@@ -126,11 +139,11 @@
                                       Content="+"
                                       IsChecked="{Binding ShowTickets}" />
                         <CheckBox Grid.Column="17"
-                                      Command="{Binding ElementName=MainGrid,
-                                                        Path=DataContext.SavePlayer}"
-                                      CommandParameter="{Binding}"
-                                      Content="save"
-                                      IsChecked="{Binding Saved}" />
+                                  Command="{Binding ElementName=MainGrid,
+                                                    Path=DataContext.SavePlayer}"
+                                  CommandParameter="{Binding}"
+                                  Content="save"
+                                  IsChecked="{Binding Saved}" />
                         <Button Grid.Column="18"
                                 Command="{Binding ElementName=MainGrid,
                                                   Path=DataContext.KillCommand}"
@@ -178,6 +191,11 @@
             <ListView.ItemTemplate>
                 <DataTemplate DataType="greatRandom:Player">
                     <Grid HorizontalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -200,8 +218,12 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="{Binding Name}" />
-                        <Label Grid.Column="1" Content="{Binding Money}" />
-                        <Label Grid.Column="2" Content="{Binding GamesPlayed}" />
+                        <Label Grid.Column="1"
+                               HorizontalAlignment="Right"
+                               Content="{Binding Money}" />
+                        <Label Grid.Column="2"
+                               HorizontalAlignment="Right"
+                               Content="{Binding GamesPlayed}" />
                         <Label Grid.Column="3" Content="{Binding Stake}" />
                         <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
                         <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
@@ -209,12 +231,45 @@
                         <Label Grid.Column="7" Content="{Binding System}" />
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />
                         <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
-                        <Label Grid.Column="10" Content="{Binding SpendMoney}" />
-                        <Label Grid.Column="11" Content="{Binding CurrentMinus, StringFormat={}{0:C}}" />
-                        <Label Grid.Column="12" Content="{Binding BiggestMinus, StringFormat={}{0:C}}" />
+                        <Label Grid.Column="10"
+                               HorizontalAlignment="Right"
+                               Content="{Binding SpendMoney}" />
+                        <Label Grid.Column="11"
+                               HorizontalAlignment="Right"
+                               Content="{Binding CurrentMinus,
+                                                 StringFormat={}{0:C}}" />
+                        <Label Grid.Column="12"
+                               HorizontalAlignment="Right"
+                               Content="{Binding BiggestMinus,
+                                                 StringFormat={}{0:C}}" />
                         <Label Grid.Column="13" Content="{Binding HotRange}" />
                         <Label Grid.Column="14" Content="{Binding ColdRange}" />
                         <Label Grid.Column="15" Content="{Binding StatRange}" />
+                        <ToggleButton Grid.Column="16"
+                                      Content="+"
+                                      IsChecked="{Binding ShowTickets}" />
+
+                        <ListView Grid.Row="1"
+                                  Grid.ColumnSpan="16"
+                                  ItemsSource="{Binding Tickets}"
+                                  Visibility="{Binding ShowTicketsVisibility}">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate DataType="greatRandom:Ticket">
+                                    <ListView ItemsSource="{Binding Numbers}">
+                                        <ListView.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ListView.ItemsPanel>
+                                    </ListView>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
 
                     </Grid>
                 </DataTemplate>

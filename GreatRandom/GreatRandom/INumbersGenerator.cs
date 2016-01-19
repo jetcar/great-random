@@ -9,6 +9,7 @@ namespace GreatRandom
         HashSet<int> Generate();
         int Maxnumber { get; }
         bool HaveNext { get; }
+        bool isLast { get;  }
         void Load();
     }
 }

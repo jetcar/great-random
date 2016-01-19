@@ -74,7 +74,7 @@ namespace UnitTestProject1
             var generator = (KenoLoader)window.generator;
             generator.Path = "test.xml";
             generator.Load();
-            var player = new Player() { NumbersAmount = 8, Name = "Loaded4", NumberOfTickets = 28, Stake = 1, SameNumbers = false, Money = 100, System = 6, HotNumbers = 7, ColdNumbers = 0, HotRange = 11, ColdRange = 21, StatRange = 1, Random = new Random() };
+            var player = new Player() { NumbersAmount = 8, Name = "Loaded4", NumberOfTickets = 28, Stake = 1, SameNumbers = false, Money = 100, System = 6, HotNumbers = 7, ColdNumbers = 0, HotRange = 11, ColdRange = 21, StatRange = 1 };
 
             for (int i = 7800; i < generator.results.Count; i++)
             {

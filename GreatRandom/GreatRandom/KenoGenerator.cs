@@ -12,9 +12,23 @@ namespace GreatRandom
         private int amount = 20;
         public int Maxnumber { get { return 64; } }
         public bool HaveNext { get { return true; } }
+
+        public bool isLast
+        {
+            get
+            {
+                if (index % 10000 == 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        private int index = 0;
         public void Load()
         {
-            
+
         }
 
         public HashSet<int> Generate()
@@ -30,6 +44,7 @@ namespace GreatRandom
                     continue;
                 numbers.Add(value);
             }
+            index++;
             return numbers;
 
         }
