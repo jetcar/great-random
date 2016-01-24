@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:greatRandom="clr-namespace:GreatRandom"
         Title="MainWindow"
-        Width="1025"
+        Width="1225"
         Height="650"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid Name="MainGrid">
@@ -42,6 +42,8 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
                 <ColumnDefinition Width="10" />
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Name" />
@@ -60,8 +62,10 @@
             <Label Grid.Column="13" Content="hot range" />
             <Label Grid.Column="14" Content="cold range" />
             <Label Grid.Column="15" Content="stat range" />
-            <Label Grid.Column="16" Content="tickets" />
-            <Label Grid.Column="17" Content="save" />
+            <Label Grid.Column="16" Content="tit ch L" />
+            <Label Grid.Column="17" Content="tit ch W" />
+            <Label Grid.Column="18" Content="tickets" />
+            <Label Grid.Column="19" Content="save" />
         </Grid>
         <ListView Grid.Row="2"
                   HorizontalAlignment="Stretch"
@@ -86,6 +90,8 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -135,16 +141,18 @@
                         <Label Grid.Column="13" Content="{Binding HotRange}" />
                         <Label Grid.Column="14" Content="{Binding ColdRange}" />
                         <Label Grid.Column="15" Content="{Binding StatRange}" />
-                        <ToggleButton Grid.Column="16"
+                        <Label Grid.Column="16" Content="{Binding TicketChangeLost}" />
+                        <Label Grid.Column="17" Content="{Binding TicketChangeWon}" />
+                        <ToggleButton Grid.Column="18"
                                       Content="+"
                                       IsChecked="{Binding ShowTickets}" />
-                        <CheckBox Grid.Column="17"
+                        <CheckBox Grid.Column="19"
                                   Command="{Binding ElementName=MainGrid,
                                                     Path=DataContext.SavePlayer}"
                                   CommandParameter="{Binding}"
                                   Content="save"
                                   IsChecked="{Binding Saved}" />
-                        <Button Grid.Column="18"
+                        <Button Grid.Column="20"
                                 Command="{Binding ElementName=MainGrid,
                                                   Path=DataContext.KillCommand}"
                                 CommandParameter="{Binding}"
@@ -216,6 +224,8 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="{Binding Name}" />
                         <Label Grid.Column="1"
@@ -245,7 +255,9 @@
                         <Label Grid.Column="13" Content="{Binding HotRange}" />
                         <Label Grid.Column="14" Content="{Binding ColdRange}" />
                         <Label Grid.Column="15" Content="{Binding StatRange}" />
-                        <ToggleButton Grid.Column="16"
+                        <Label Grid.Column="16" Content="{Binding TicketChangeLost}" />
+                        <Label Grid.Column="17" Content="{Binding TicketChangeWon}" />
+                        <ToggleButton Grid.Column="18"
                                       Content="+"
                                       IsChecked="{Binding ShowTickets}" />
 

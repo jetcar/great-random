@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Xml.Serialization;
 using GreatRandom.Annotations;
 using Newtonsoft.Json;
 
@@ -35,6 +31,8 @@ namespace GreatRandom
         private Property _stake;
         private Property _statRange;
         private Property _system;
+        private Property _ticketChangeLost;
+        private Property _ticketChangeWon;
 
         public Player()
         {
@@ -48,6 +46,8 @@ namespace GreatRandom
             _stake = GetProperty("Stake");
             _statRange = GetProperty("StatRange");
             _system = GetProperty("System");
+            _ticketChangeLost = GetProperty("TicketChangeLost");
+            _ticketChangeWon = GetProperty("TicketChangeWon");
         }
 
 
@@ -105,6 +105,28 @@ namespace GreatRandom
             }
         }
 
+        [JsonProperty]
+        public int TicketChangeLost
+        {
+            get { return _ticketChangeLost.IntValue; }
+            set
+            {
+                if (value == _ticketChangeLost.IntValue) return;
+                _ticketChangeLost.IntValue = value;
+            }
+        }
+
+        [JsonProperty]
+        public int TicketChangeWon
+        {
+            get { return _ticketChangeWon.IntValue; }
+            set
+            {
+                if (value == _ticketChangeWon.IntValue) return;
+                _ticketChangeWon.IntValue = value;
+            }
+        }
+
 
         [JsonProperty]
         public int HotRange
@@ -148,7 +170,7 @@ namespace GreatRandom
                 OnPropertyChanged();
             }
         }
-        [JsonIgnoreAttribute]
+        [JsonProperty]
         public IList<Ticket> Tickets
         {
             get { return _tickets; }
@@ -244,7 +266,7 @@ namespace GreatRandom
             }
         }
 
-        [JsonIgnoreAttribute]
+        [JsonProperty]
         public int BiggestMinus
         {
             get { return _biggestMinus; }
@@ -284,7 +306,7 @@ namespace GreatRandom
 
         public override string ToString()
         {
-            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}", NumberOfTickets, SameNumbers, NumbersAmount, GamesPlayed, Stake, System, ColdNumbers, ColdRange, HotNumbers, HotRange, StatRange, System);
+            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}", NumberOfTickets, SameNumbers, NumbersAmount, GamesPlayed, Stake, System, ColdNumbers, ColdRange, HotNumbers, HotRange, StatRange, System,TicketChangeLost,TicketChangeWon);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

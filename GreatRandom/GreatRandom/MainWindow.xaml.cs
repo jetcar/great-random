@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using GreatRandom.Annotations;
 using Newtonsoft.Json;
 
@@ -18,7 +16,7 @@ namespace GreatRandom
     /// </summary>
     public partial class MainWindow : INotifyPropertyChanged
     {
-        static int SelectAmountMax = 12;
+        static int SelectAmountMax = 15;
         static int SystemMax = 10;
         static int SystemMin = 2;
         public static int startMoney = 1000;
@@ -142,7 +140,9 @@ namespace GreatRandom
             foreach (var savedplayer in savedplayers)
             {
                 savedplayer.Saved = true;
-                savedplayer.Money = startMoney;
+                savedplayer.Money = savedplayer.BiggestMinus;
+                if (savedplayer.Money < startMoney)
+                    savedplayer.Money = startMoney * 100;
                 savedplayer.Random = new Random(random.Next());
                 Players.Add(savedplayer);
             }
@@ -182,11 +182,12 @@ namespace GreatRandom
 
 
                 SortableObservableCollection<Player> lostPlayers = new SortableObservableCollection<Player>();
-                var tempStat = new SortableObservableCollection<NumberStat>();
-                tempStat.Sync(NumbersStatistic);
-                MyThreadPool<Player>.Foreach(Players, player =>
-                //                foreach (var player in Players)
+                //                MyThreadPool<Player>.Foreach(Players, player =>
+                foreach (var player in Players)
                 {
+                    var tempStat = new SortableObservableCollection<NumberStat>();
+                    tempStat.Sync(NumbersStatistic);
+
                     var random = player.Random;
                     if (player.ColdNumbers + player.HotNumbers > 0)
                     {
@@ -198,6 +199,28 @@ namespace GreatRandom
                     var moneyWon = Calculate.CalculateTickets(numbers, player.Tickets);
 
                     player.Money += moneyWon;
+                    if (moneyWon == 0)
+                    {
+                        player.NumberOfTickets += player.TicketChangeLost;
+                        if (player.TicketChangeLost < 0)
+                        {
+                            while (player.Tickets.Count > player.NumberOfTickets && player.Tickets.Count > 1)
+                            {
+                                player.Tickets.RemoveAt(player.Tickets.Count - 1);
+                            }
+                        }
+                    }
+                    if (moneyWon > 0)
+                    {
+                        player.NumberOfTickets += player.TicketChangeWon;
+                        if (player.TicketChangeWon < 0)
+                        {
+                            while (player.Tickets.Count > player.NumberOfTickets && player.Tickets.Count > 1)
+                            {
+                                player.Tickets.RemoveAt(player.Tickets.Count - 1);
+                            }
+                        }
+                    }
                     var currentMinus = moneyWon - player.CurrentMinus;
                     if (currentMinus < 0)
                         player.CurrentMinus = -currentMinus;
@@ -205,14 +228,17 @@ namespace GreatRandom
                     {
                         player.CurrentMinus = 0;
                     }
+                    
+
                     //if (player.CurrentMinus > startMoney)
-                      //  lostPlayers.Add(player);
+                    //  lostPlayers.Add(player);
                     if (player.Money <= 0)
                         lostPlayers.Add(player);
 
+                    player.NumberOfTickets = player.Tickets.Count;
                     player.GamesPlayed++;
                 }
-                    );
+                //                    );
 
                 foreach (var numberStat in NumbersStatistic)
                 {
@@ -229,13 +255,13 @@ namespace GreatRandom
                 {
                     counter = CreateChildren(counter);
                 }
-                if (generator.isLast)
-                {
-                    foreach (var player in Players)
-                    {
-                        player.Money = startMoney;
-                    }
-                }
+                //if (generator.isLast)
+                //{
+                //    foreach (var player in Players)
+                //    {
+                //        player.Money = startMoney;
+                //    }
+                //}
 
                 while (Players.Count > 2000)
                 {
@@ -268,18 +294,14 @@ namespace GreatRandom
 
         private int CreateChildren(int counter)
         {
-            var topPlayers = new SortableObservableCollection<Player>();
-            topPlayers.Sync(Players);
-            topPlayers.Sort(x => x.Money, ListSortDirection.Descending);
+            Players.Sort(x => x.Money, ListSortDirection.Descending);
 
-            while (topPlayers.Count > 20)
-            {
-                topPlayers.RemoveAt(topPlayers.Count - 1);
-            }
-            for (int i = 0; i < topPlayers.Count; i++)
+            var topPlayers = Players.Where(x => x.Money > startMoney).ToList();
+
+            for (int i = 0; i < topPlayers.Count() && i < 20; i++)
             {
                 var pl1 = topPlayers[i];
-                for (int j = 0; j < topPlayers.Count; j++)
+                for (int j = 0; j < topPlayers.Count(); j++)
                 {
                     var pl2 = topPlayers[j];
                     var enum1 = pl1.Properties.GetEnumerator();
@@ -319,11 +341,11 @@ namespace GreatRandom
                         Debug.Assert(child.HotRange >= child.HotNumbers);
                         Debug.Assert(child.ColdRange >= child.ColdNumbers);
                         Players.Add(child);
-                        if (Players.Count > 2000)
+                        if (Players.Count > 1500)
                             break;
                     }
                 }
-                if (Players.Count > 2000)
+                if (Players.Count > 1500)
                     break;
             }
             for (int index = Players.Count; index < 2000; index++)
@@ -371,7 +393,7 @@ namespace GreatRandom
         {
             if (player.System != player.NumbersAmount)
             {
-                if (!player.SameNumbers || player.Tickets.Count == 0)
+                if (!player.SameNumbers || player.Tickets.Count != player.NumberOfTickets)
                 {
 
                     var array = new HashSet<int>();
@@ -408,6 +430,12 @@ namespace GreatRandom
                         }
                         currentTicket.Stake = player.Stake;
                         player.Tickets.Add(currentTicket);
+                    }
+                    while (player.Tickets.Count < player.NumberOfTickets)
+                    {
+                        var ticket = new Ticket();
+                        ticket.Numbers = GenerateRandomsArray(player.System, ticket.Numbers, random);
+                        player.Tickets.Add(ticket);
                     }
                 }
             }
@@ -454,6 +482,7 @@ namespace GreatRandom
                 }
             }
 
+            //Debug.Assert(player.NumberOfTickets == player.Tickets.Count);
             foreach (var ticket in player.Tickets)
             {
                 player.Money -= ticket.Stake;
@@ -491,7 +520,7 @@ namespace GreatRandom
                         }
                         combinations = Combinations(numbersAmount, system);
 
-                    } while (combinations * stake > startMoney || combinations > 15 || numbersAmount == system);
+                    } while (combinations * stake > startMoney);
                     ticketsAmount = combinations;
                 }
                 else
@@ -518,21 +547,26 @@ namespace GreatRandom
                     var hotFirst = random.Next(0, 2) == 1;
                     if (hotFirst)
                     {
-                        hotnumbers = random.Next(1, numbersAmount + 1);
-                        coldnumbers = random.Next(1, numbersAmount - hotnumbers + 1);
+                        hotnumbers = random.Next(0, numbersAmount + 1);
+                        coldnumbers = random.Next(0, numbersAmount - hotnumbers + 1);
                     }
                     else
                     {
-                        coldnumbers = random.Next(1, numbersAmount + 1);
+                        coldnumbers = random.Next(0, numbersAmount + 1);
 
-                        hotnumbers = random.Next(1, numbersAmount - coldnumbers + 1);
+                        hotnumbers = random.Next(0, numbersAmount - coldnumbers + 1);
 
                     }
-                    hotRange = random.Next(hotnumbers, generator.Maxnumber / 3);
-                    coldRange = random.Next(coldnumbers, generator.Maxnumber / 3);
-                    statRange = random.Next(1, 100 + 1);
+                    if (hotnumbers > 0)
+                        hotRange = random.Next(hotnumbers, generator.Maxnumber / 3);
+                    if (coldnumbers > 0)
+                        coldRange = random.Next(coldnumbers, generator.Maxnumber / 3);
+                    if (hotnumbers > 0 && coldnumbers > 0)
+                        statRange = random.Next(1, 100 + 1);
 
                 }
+                int changeLost = random.Next((int)-ticketsAmount, (int)ticketsAmount);
+                int changeWon = random.Next((int)-ticketsAmount, (int)ticketsAmount);
                 Debug.Assert(numbersAmount > 0);
                 Debug.Assert(numbersAmount >= system);
                 playernew = new Player()
@@ -549,6 +583,8 @@ namespace GreatRandom
                     HotRange = hotRange,
                     ColdRange = coldRange,
                     StatRange = statRange,
+                    TicketChangeLost = changeLost,
+                    TicketChangeWon = changeWon,
                     Random = new Random(random.Next())
                 };
 

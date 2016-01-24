@@ -1,10 +1,5 @@
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Data;
-using System.Windows.Threading;
-using System.Xml.Serialization;
-using GreatRandom.Annotations;
+using Newtonsoft.Json;
 
 namespace GreatRandom
 {
@@ -26,7 +21,7 @@ namespace GreatRandom
             set { _numbers = value; }
         }
 
-        [XmlIgnore]
+       [JsonIgnore]
         public int WonAmount
         {
             get { return _wonAmount; }
@@ -37,7 +32,7 @@ namespace GreatRandom
             }
         }
 
-        [XmlIgnore]
+       [JsonIgnoreAttribute]
         public int Stake
         {
             get { return _stake; }
@@ -47,7 +42,7 @@ namespace GreatRandom
                 _stake = value;
             }
         }
-        [XmlIgnore]
+        [JsonIgnoreAttribute]
         public bool IsWon { get; set; }
 
     }
