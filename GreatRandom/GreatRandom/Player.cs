@@ -27,12 +27,13 @@ namespace GreatRandom
         private Property _coldNumbers;
         private Property _numberOfTickets;
         private Property _numbersAmount;
-        private Property _sameNumbers;
         private Property _stake;
         private Property _statRange;
         private Property _system;
         private Property _ticketChangeLost;
         private Property _ticketChangeWon;
+        private Property _luckyAmount;
+        private IList<int> _luckyNumbers = new List<int>();
 
         public Player()
         {
@@ -42,15 +43,20 @@ namespace GreatRandom
             _hotNumbers = GetProperty("HotNumbers");
             _numbersAmount = GetProperty("NumbersAmount");
             _numberOfTickets = GetProperty("NumberOfTickets");
-            _sameNumbers = GetProperty("SameNumbers");
             _stake = GetProperty("Stake");
             _statRange = GetProperty("StatRange");
             _system = GetProperty("System");
             _ticketChangeLost = GetProperty("TicketChangeLost");
             _ticketChangeWon = GetProperty("TicketChangeWon");
+            _luckyAmount = GetProperty("LuckyAmount");
         }
 
-
+        [JsonProperty]
+        public IList<int> LuckyNumbers
+        {
+            get { return _luckyNumbers; }
+            set { _luckyNumbers = value; }
+        }
 
         [JsonIgnoreAttribute]
         public Visibility ShowTicketsVisibility
@@ -113,6 +119,17 @@ namespace GreatRandom
             {
                 if (value == _ticketChangeLost.IntValue) return;
                 _ticketChangeLost.IntValue = value;
+            }
+        }
+        
+        [JsonProperty]
+        public int LuckyAmount
+        {
+            get { return _luckyAmount.IntValue; }
+            set
+            {
+                if (value == _luckyAmount.IntValue) return;
+                _luckyAmount.IntValue = value;
             }
         }
 
@@ -212,16 +229,7 @@ namespace GreatRandom
                 _numbersAmount.IntValue = value;
             }
         }
-        [JsonProperty]
-        public bool SameNumbers
-        {
-            get { return _sameNumbers.BoolValue; }
-            set
-            {
-                if (value == _sameNumbers.BoolValue) return;
-                _sameNumbers.BoolValue = value;
-            }
-        }
+
         [JsonProperty]
         public int Stake
         {
@@ -306,7 +314,7 @@ namespace GreatRandom
 
         public override string ToString()
         {
-            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}", NumberOfTickets, SameNumbers, NumbersAmount, GamesPlayed, Stake, System, ColdNumbers, ColdRange, HotNumbers, HotRange, StatRange, System,TicketChangeLost,TicketChangeWon);
+            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}", NumberOfTickets, NumbersAmount, GamesPlayed, Stake, System, ColdNumbers, ColdRange, HotNumbers, HotRange, StatRange, System,TicketChangeLost,TicketChangeWon,LuckyAmount);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

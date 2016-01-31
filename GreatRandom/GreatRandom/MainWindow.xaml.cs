@@ -36,11 +36,8 @@ namespace GreatRandom
         private SortableObservableCollection<Player> _dTopPlayers = new SortableObservableCollection<Player>();
         private bool haveChanges = true;
         public INumbersGenerator generator = new KenoLoader();
-        //        public INumbersGenerator generator = new KenoGenerator();
-        private HashSet<string> playerSignatures = new HashSet<string>();
-        private string filename = "processedplayers.txt";
+        //                public INumbersGenerator generator = new KenoGenerator();
         private Random random;
-        StreamWriter writer;
         public MainWindow()
         {
             random = new Random();
@@ -99,7 +96,6 @@ namespace GreatRandom
         void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             gameprocessingthread.Abort();
-            writer.Flush();
 
             var stringwriter = Serialize(savedplayers);
 
@@ -112,15 +108,6 @@ namespace GreatRandom
 
         void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            StreamReader reader = new StreamReader(filename);
-            while (!reader.EndOfStream)
-            {
-                var line = reader.ReadLine();
-                playerSignatures.Add(line);
-            }
-            reader.Close();
-            writer = new StreamWriter(filename, true);
-
             generator.Load();
             for (int i = 0; i < 100; i++)
             {
@@ -167,8 +154,8 @@ namespace GreatRandom
 
         private void LoadStoredPlayers()
         {
-            var playernew = new Player() { NumbersAmount = 11, Name = "Loaded1", NumberOfTickets = 11, Stake = 1, SameNumbers = false, Money = startMoney, System = 10, HotNumbers = 6, ColdNumbers = 2, HotRange = 12, ColdRange = 30, StatRange = 7, Random = new Random(random.Next()) };
-            Players.Add(playernew);
+            //            var playernew = new Player() { NumbersAmount = 11, Name = "Loaded1", NumberOfTickets = 11, Stake = 1, Money = startMoney, System = 10, HotNumbers = 6, ColdNumbers = 2, HotRange = 12, ColdRange = 30, StatRange = 7, Random = new Random(random.Next()) };
+            //            Players.Add(playernew);
         }
 
 
@@ -228,10 +215,10 @@ namespace GreatRandom
                     {
                         player.CurrentMinus = 0;
                     }
-                    
 
-                    //if (player.CurrentMinus > startMoney)
-                    //  lostPlayers.Add(player);
+
+                    if (player.CurrentMinus > startMoney)
+                        lostPlayers.Add(player);
                     if (player.Money <= 0)
                         lostPlayers.Add(player);
 
@@ -255,13 +242,13 @@ namespace GreatRandom
                 {
                     counter = CreateChildren(counter);
                 }
-                //if (generator.isLast)
-                //{
-                //    foreach (var player in Players)
-                //    {
-                //        player.Money = startMoney;
-                //    }
-                //}
+                if (generator.isLast)
+                {
+                    foreach (var player in Players)
+                    {
+                        player.Money = startMoney;
+                    }
+                }
 
                 while (Players.Count > 2000)
                 {
@@ -340,6 +327,36 @@ namespace GreatRandom
                         child.System = random.Next(1, child.NumbersAmount + 1);
                         Debug.Assert(child.HotRange >= child.HotNumbers);
                         Debug.Assert(child.ColdRange >= child.ColdNumbers);
+
+                        if (child.TicketChangeLost > 0 && child.TicketChangeWon > 0)
+                        {
+                            child.TicketChangeLost *= -1;
+                        }
+                        if (child.TicketChangeLost < 0 && child.TicketChangeWon < 0)
+                        {
+                            child.TicketChangeLost *= -1;
+                        }
+
+                        var luckyNumbers = new List<int>();
+                        foreach (var luckyNumber in pl1.LuckyNumbers)
+                        {
+                            if (!luckyNumbers.Contains(luckyNumber))
+                                luckyNumbers.Add(luckyNumber);
+                        }
+                        foreach (var luckyNumber in pl2.LuckyNumbers)
+                        {
+                            if (!luckyNumbers.Contains(luckyNumber))
+                                luckyNumbers.Add(luckyNumber);
+                        }
+
+
+                        while (child.LuckyNumbers.Count < child.LuckyAmount)
+                        {
+                            var randomLuck = random.Next(0, luckyNumbers.Count);
+                            if (!child.LuckyNumbers.Contains(luckyNumbers[randomLuck]))
+                                child.LuckyNumbers.Add(luckyNumbers[randomLuck]);
+                        }
+
                         Players.Add(child);
                         if (Players.Count > 1500)
                             break;
@@ -358,10 +375,8 @@ namespace GreatRandom
 
         private int RemoveAndCreateNewPlayer(Player player, int counter)
         {
-            playerSignatures.Add(player.ToString());
 
             Players.Remove(player);
-            writer.WriteLine(player.ToString());
             savedplayers.Remove(player);
 
             var minSpendMoney = 0;
@@ -383,20 +398,34 @@ namespace GreatRandom
                 TopPlayers.RemoveAt(TopPlayers.Count - 1);
             }
 
-
-
             return counter;
 
         }
 
         public void GenerateNumbersBuyTickets(Player player, SortableObservableCollection<NumberStat> stats, Random random)
         {
+            Debug.Assert(player.LuckyNumbers.Count <= 10);
+            if (player.LuckyNumbers.Count < player.LuckyAmount)
+            {
+                var array = new HashSet<int>();
+                GenerateRandomsArray(player.LuckyAmount, array, player.Random);
+                Debug.Assert(array.Count <= 10);
+                foreach (var number in array)
+                {
+                    player.LuckyNumbers.Add(number);
+                }
+            }
+            Debug.Assert(player.LuckyAmount <= 10);
+            Debug.Assert(player.LuckyNumbers.Count <= 10);
             if (player.System != player.NumbersAmount)
             {
-                if (!player.SameNumbers || player.Tickets.Count != player.NumberOfTickets)
+                if (player.LuckyAmount != player.System || player.Tickets.Count != player.NumberOfTickets)
                 {
-
                     var array = new HashSet<int>();
+                    foreach (var luckyNumber in player.LuckyNumbers)
+                    {
+                        array.Add(luckyNumber);
+                    }
                     if (player.HotNumbers > 0)
                     {
                         while (array.Count < player.HotNumbers)
@@ -408,19 +437,25 @@ namespace GreatRandom
                     }
                     if (player.ColdNumbers > 0)
                     {
+                        var coldRange = player.ColdRange;
+
                         while (array.Count < player.ColdNumbers + player.HotNumbers)
                         {
-                            var coldindex = random.Next(0, player.ColdRange);
+                            var coldindex = random.Next(0, coldRange);
                             if (!array.Contains(stats.Get(stats.Count - (coldindex + 1)).Number))
                                 array.Add(stats.Get(stats.Count - (coldindex + 1)).Number);
+                            else
+                            {
+                                coldRange++;
+                            }
 
                         }
                     }
                     array = GenerateRandomsArray(player.NumbersAmount, array, random);
 
                     var combinations = combination(array.ToArray(), player.System).ToArray();
+                    Debug.Assert(combinations.Length < 2000);
                     player.Tickets.Clear();
-                    ;
                     foreach (var comb in combinations)
                     {
                         var currentTicket = new Ticket();
@@ -441,12 +476,16 @@ namespace GreatRandom
             }
             else
             {
-                if (!player.SameNumbers)
+                if (player.LuckyAmount != player.System)
                     player.Tickets.Clear();
 
                 while (player.Tickets.Count < player.NumberOfTickets)
                 {
                     var ticket = new Ticket();
+                    foreach (var luckyNumber in player.LuckyNumbers)
+                    {
+                        ticket.Numbers.Add(luckyNumber);
+                    }
                     if (player.HotNumbers > 0)
                     {
                         while (ticket.Numbers.Count < player.HotNumbers)
@@ -458,12 +497,20 @@ namespace GreatRandom
                     }
                     if (player.ColdNumbers > 0)
                     {
+                        var coldRange = player.ColdRange;
+
                         while (ticket.Numbers.Count < player.ColdNumbers + player.HotNumbers)
                         {
-                            var coldindex = random.Next(0, player.ColdRange);
+                            var coldindex = random.Next(0, coldRange);
                             var stat = stats.Get(stats.Count - (coldindex + 1));
                             if (!ticket.Numbers.Contains(stat.Number))
+                            {
                                 ticket.Numbers.Add(stat.Number);
+                            }
+                            else
+                            {
+                                coldRange++;
+                            }
 
                         }
                     }
@@ -473,7 +520,7 @@ namespace GreatRandom
                 for (int j = 0; j < player.Tickets.Count; j++)
                 {
                     var currentTicket = player.Tickets[j];
-                    if (!player.SameNumbers || currentTicket.IsWon)
+                    if (player.LuckyAmount != player.System || currentTicket.IsWon)
                     {
                         currentTicket.Numbers = GenerateRandomsArray(player.System, currentTicket.Numbers, random);
                     }
@@ -498,98 +545,109 @@ namespace GreatRandom
         {
             Player playernew;
 
-            do
+
+            var numbersAmount = 0;
+            var system = 0;
+            long combinations = 0;
+            var stake = stakes[random.Next(1, MaxStake + 1)];
+            long ticketsAmount = 0;
+            var useSystem = random.Next(0, 2) == 1;
+
+
+            if (useSystem)
             {
-                var numbersAmount = 0;
-                var system = 0;
-                long combinations = 0;
-                var stake = stakes[random.Next(1, MaxStake + 1)];
-                long ticketsAmount = 0;
-                var useSystem = random.Next(0, 2) == 1;
-
-
-                if (useSystem)
+                do
                 {
-                    do
+                    numbersAmount = random.Next(SystemMin, SelectAmountMax + 1);
+                    system = random.Next(SystemMin, numbersAmount + 1);
+                    while (system > SystemMax)
                     {
-                        numbersAmount = random.Next(SystemMin, SelectAmountMax + 1);
-                        system = random.Next(SystemMin, numbersAmount + 1);
-                        while (system > SystemMax)
-                        {
-                            system = random.Next(1, numbersAmount + 1);
-                        }
-                        combinations = Combinations(numbersAmount, system);
+                        system = random.Next(1, numbersAmount + 1);
+                    }
+                    combinations = Combinations(numbersAmount, system);
 
-                    } while (combinations * stake > startMoney);
-                    ticketsAmount = combinations;
+                } while (combinations * stake > startMoney);
+                ticketsAmount = combinations;
+            }
+            else
+            {
+                while (ticketsAmount * stake > 100 || ticketsAmount < 1)
+                {
+                    ticketsAmount = random.Next(1, 15 + 1);
+                    stake = stakes[random.Next(1, MaxStake + 1)];
+                }
+                numbersAmount = random.Next(SystemMin, SystemMax + 1);
+                system = (int)numbersAmount;
+            }
+
+            var luckynumbers = random.Next(0, system + 1);
+
+            var hotnumbers = 0;
+            var coldnumbers = 0;
+            var hotRange = 0;
+            var coldRange = 0;
+            var useColdHot = random.Next(0, 2) == 1;
+            var statRange = 0;
+
+            if (useColdHot)
+            {
+                var hotFirst = random.Next(0, 2) == 1;
+                if (hotFirst)
+                {
+                    hotnumbers = random.Next(0, numbersAmount + 1);
+                    coldnumbers = random.Next(0, numbersAmount - hotnumbers + 1);
                 }
                 else
                 {
-                    while (ticketsAmount * stake > 100 || ticketsAmount < 1)
-                    {
-                        ticketsAmount = random.Next(1, 15 + 1);
-                        stake = stakes[random.Next(1, MaxStake + 1)];
-                    }
-                    numbersAmount = random.Next(SystemMin, SystemMax + 1);
-                    system = (int)numbersAmount;
-                }
+                    coldnumbers = random.Next(0, numbersAmount + 1);
 
-
-                var hotnumbers = 0;
-                var coldnumbers = 0;
-                var hotRange = 0;
-                var coldRange = 0;
-                var useColdHot = random.Next(0, 2) == 1;
-                var statRange = 0;
-
-                if (useColdHot)
-                {
-                    var hotFirst = random.Next(0, 2) == 1;
-                    if (hotFirst)
-                    {
-                        hotnumbers = random.Next(0, numbersAmount + 1);
-                        coldnumbers = random.Next(0, numbersAmount - hotnumbers + 1);
-                    }
-                    else
-                    {
-                        coldnumbers = random.Next(0, numbersAmount + 1);
-
-                        hotnumbers = random.Next(0, numbersAmount - coldnumbers + 1);
-
-                    }
-                    if (hotnumbers > 0)
-                        hotRange = random.Next(hotnumbers, generator.Maxnumber / 3);
-                    if (coldnumbers > 0)
-                        coldRange = random.Next(coldnumbers, generator.Maxnumber / 3);
-                    if (hotnumbers > 0 && coldnumbers > 0)
-                        statRange = random.Next(1, 100 + 1);
+                    hotnumbers = random.Next(0, numbersAmount - coldnumbers + 1);
 
                 }
-                int changeLost = random.Next((int)-ticketsAmount, (int)ticketsAmount);
-                int changeWon = random.Next((int)-ticketsAmount, (int)ticketsAmount);
-                Debug.Assert(numbersAmount > 0);
-                Debug.Assert(numbersAmount >= system);
-                playernew = new Player()
-                {
-                    NumbersAmount = numbersAmount,
-                    Name = counter++.ToString(),
-                    NumberOfTickets = (int)ticketsAmount,
-                    Stake = stake,
-                    SameNumbers = random.Next(0, 2) == 1,
-                    Money = startMoney,
-                    System = system,
-                    HotNumbers = hotnumbers,
-                    ColdNumbers = coldnumbers,
-                    HotRange = hotRange,
-                    ColdRange = coldRange,
-                    StatRange = statRange,
-                    TicketChangeLost = changeLost,
-                    TicketChangeWon = changeWon,
-                    Random = new Random(random.Next())
-                };
+                if (hotnumbers > 0)
+                    hotRange = random.Next(hotnumbers, generator.Maxnumber / 3);
+                if (coldnumbers > 0)
+                    coldRange = random.Next(coldnumbers, generator.Maxnumber / 3);
+                if (hotnumbers > 0 && coldnumbers > 0)
+                    statRange = random.Next(1, 100 + 1);
 
-            } while (playerSignatures.Contains(playernew.ToString()));
-            playerSignatures.Add(playernew.ToString());
+            }
+            long maxChange = 10;
+            if (ticketsAmount > maxChange)
+                maxChange = ticketsAmount;
+            int changeLost = random.Next((int)-ticketsAmount, (int)ticketsAmount);
+            int changeWon = random.Next((int)-ticketsAmount, (int)ticketsAmount);
+            while (changeWon > 1 && changeLost > 1)
+            {
+                changeLost = random.Next((int)-maxChange, (int)maxChange);
+                changeWon = random.Next((int)-maxChange, (int)maxChange);
+            }
+            while (changeWon < 1 && changeLost < 1)
+            {
+                changeLost = random.Next((int)-maxChange, (int)maxChange);
+                changeWon = random.Next((int)-maxChange, (int)maxChange);
+            }
+            Debug.Assert(numbersAmount > 0);
+            Debug.Assert(numbersAmount >= system);
+            playernew = new Player()
+            {
+                NumbersAmount = numbersAmount,
+                Name = counter++.ToString(),
+                NumberOfTickets = (int)ticketsAmount,
+                Stake = stake,
+                Money = startMoney,
+                System = system,
+                HotNumbers = hotnumbers,
+                ColdNumbers = coldnumbers,
+                HotRange = hotRange,
+                ColdRange = coldRange,
+                StatRange = statRange,
+                TicketChangeLost = changeLost,
+                TicketChangeWon = changeWon,
+                LuckyAmount = luckynumbers,
+                Random = new Random(random.Next())
+            };
+
             return playernew;
 
         }

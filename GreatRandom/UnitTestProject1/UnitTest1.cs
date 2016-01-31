@@ -32,6 +32,7 @@ namespace UnitTestProject1
                 //Assert.AreEqual((window.PlayerCounter).ToString(), player.Name);
 
                 window.GenerateNumbersBuyTickets(player, window.NumbersStatistic, random);
+                Assert.AreEqual(player.LuckyNumbers.Count,player.LuckyAmount);
                 foreach (var ticket in player.Tickets)
                 {
                     Assert.AreEqual(ticket.Stake, player.Stake);
@@ -75,7 +76,7 @@ namespace UnitTestProject1
             var generator = (KenoLoader)window.generator;
             generator.Path = "test.xml";
             generator.Load();
-            var player = new Player() { NumbersAmount = 8, Name = "Loaded4", NumberOfTickets = 28, Stake = 1, SameNumbers = false, Money = 100, System = 6, HotNumbers = 7, ColdNumbers = 0, HotRange = 11, ColdRange = 21, StatRange = 1 };
+            var player = new Player() { NumbersAmount = 8, Name = "Loaded4", NumberOfTickets = 28, Stake = 1,  Money = 100, System = 6, HotNumbers = 7, ColdNumbers = 0, HotRange = 11, ColdRange = 21, StatRange = 1 };
 
             for (int i = 7800; i < generator.results.Count; i++)
             {
@@ -128,7 +129,6 @@ namespace UnitTestProject1
             player.NumbersAmount = 2;
             player.System = 2;
             player.Stake = 2;
-            player.SameNumbers = true;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
             var random = new Random();
@@ -162,7 +162,6 @@ namespace UnitTestProject1
             player.System = 9;
             player.Stake = 1;
             player.TicketChangeLost = 10;
-            player.SameNumbers = true;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
             var random = new Random();
@@ -195,7 +194,6 @@ namespace UnitTestProject1
             player.System = 9;
             player.Stake = 1;
             player.TicketChangeLost = 10;
-            player.SameNumbers = true;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
             var random = new Random();
@@ -227,7 +225,6 @@ namespace UnitTestProject1
             player.NumbersAmount = 12;
             player.System = 10;
             player.Stake = 2;
-            player.SameNumbers = false;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
             var random = new Random();
@@ -268,8 +265,8 @@ namespace UnitTestProject1
             var player = window.CreatePlayer(window.PlayerCounter++);
             player.NumbersAmount = 12;
             player.System = 10;
+            player.LuckyAmount = 10;
             player.Stake = 2;
-            player.SameNumbers = true;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
             var random = new Random();
@@ -354,13 +351,13 @@ namespace UnitTestProject1
             var player = window.CreatePlayer(window.PlayerCounter++);
             player.NumbersAmount = 10;
             player.NumberOfTickets = 1;
+            player.LuckyAmount = 0;
             player.System = 10;
             player.Stake = 2;
             player.HotNumbers = 2;
             player.HotRange = 2;
             player.ColdNumbers = 3;
             player.ColdRange = 3;
-            player.SameNumbers = true;
             player.StatRange = 8;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
@@ -438,13 +435,13 @@ namespace UnitTestProject1
             window.NumbersStatistic[6].Appear(true);
             var player = window.CreatePlayer(window.PlayerCounter++);
             player.NumbersAmount = 10;
+            player.LuckyAmount = 0;
             player.System = 7;
             player.Stake = 2;
             player.HotNumbers = 2;
             player.HotRange = 2;
             player.ColdNumbers = 3;
             player.ColdRange = 3;
-            player.SameNumbers = true;
             player.NumberOfTickets = (int)MainWindow.Combinations(player.NumbersAmount, player.System);
             Assert.AreEqual(player.NumberOfTickets, MainWindow.Combinations(player.NumbersAmount, player.System), 0, "Numbers:" + player.NumbersAmount.ToString() + "system:" + player.System.ToString());
             var random = new Random();

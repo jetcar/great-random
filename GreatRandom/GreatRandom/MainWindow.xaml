@@ -52,7 +52,7 @@
             <Label Grid.Column="3" Content="Stake" />
             <Label Grid.Column="4" Content="Tickets" />
             <Label Grid.Column="5" Content="Numbers" />
-            <Label Grid.Column="6" Content="SameNumbers" />
+            <Label Grid.Column="6" Content="LuckyAmount" />
             <Label Grid.Column="7" Content="System" />
             <Label Grid.Column="8" Content="hot" />
             <Label Grid.Column="9" Content="cold" />
@@ -86,6 +86,7 @@
                 <DataTemplate DataType="greatRandom:Player">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
@@ -122,7 +123,7 @@
                         <Label Grid.Column="3" Content="{Binding Stake}" />
                         <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
                         <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
-                        <Label Grid.Column="6" Content="{Binding SameNumbers}" />
+                        <Label Grid.Column="6" Content="{Binding LuckyAmount}" />
                         <Label Grid.Column="7" Content="{Binding System}" />
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />
                         <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
@@ -178,6 +179,16 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
+                        <ListView Grid.Row="2"
+                                  Grid.ColumnSpan="16"
+                                  ItemsSource="{Binding LuckyNumbers}"
+                                  Visibility="{Binding ShowTicketsVisibility}">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -200,6 +211,7 @@
                 <DataTemplate DataType="greatRandom:Player">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
@@ -237,7 +249,7 @@
                         <Label Grid.Column="3" Content="{Binding Stake}" />
                         <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
                         <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
-                        <Label Grid.Column="6" Content="{Binding SameNumbers}" />
+                        <Label Grid.Column="6" Content="{Binding LuckyAmount}" />
                         <Label Grid.Column="7" Content="{Binding System}" />
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />
                         <Label Grid.Column="9" Content="{Binding ColdNumbers}" />
@@ -281,6 +293,16 @@
                                     </ListView>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
+                        </ListView>
+                        <ListView Grid.Row="2"
+                                  Grid.ColumnSpan="16"
+                                  ItemsSource="{Binding LuckyNumbers}"
+                                  Visibility="{Binding ShowTicketsVisibility}">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
                         </ListView>
 
                     </Grid>
