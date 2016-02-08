@@ -8,6 +8,9 @@ namespace GreatRandom
         int Maxnumber { get; }
         bool HaveNext { get; }
         bool isLast { get;  }
+        int MaxSystem { get; }
+        int MinSystem { get; }
+        int SelectAmountMax { get; }
         void Load();
     }
 }

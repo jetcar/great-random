@@ -60,6 +60,7 @@
     <Compile Include="Calculate.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="INumbersGenerator.cs" />
+    <Compile Include="VikingGenerator.cs" />
     <Compile Include="KenoLoader.cs" />
     <Compile Include="KenoGenerator.cs" />
     <Compile Include="MyActionWrapper.cs" />

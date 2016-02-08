@@ -3,15 +3,13 @@ using System.Collections.Generic;
 
 namespace GreatRandom
 {
-    public class KenoGenerator : INumbersGenerator
+    public class VikingGenerator : INumbersGenerator
     {
         private Random random = new Random();
-        private int amount = 20;
-        public int Maxnumber { get { return 64; } }
+        private int amount = 6;
+        public int Maxnumber { get { return 48; } }
         public bool HaveNext { get { return true; } }
-        public int MaxSystem { get { return 10; } }
-        public int MinSystem { get { return 2; } }
-        public int SelectAmountMax { get { return 13; } }
+
         public bool isLast
         {
             get
@@ -23,6 +21,10 @@ namespace GreatRandom
                 return false;
             }
         }
+
+        public int MaxSystem { get { return 6; } }
+        public int MinSystem { get { return 6; } }
+        public int SelectAmountMax { get { return 7; } }
 
         private int index = 0;
         public void Load()

@@ -19,6 +19,10 @@ namespace GreatRandom
             get { return CurrentIndex == results.Count - 2; }
         }
 
+        public int MaxSystem { get { return 9; } }
+        public int MinSystem { get { return 9; } }
+        public int SelectAmountMax { get { return 9; } }
+
         public ObservableCollection<Result> results { get; set; }
 
         public int CurrentIndex
