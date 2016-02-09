@@ -122,7 +122,6 @@
                                Content="{Binding GamesPlayed}" />
                         <Label Grid.Column="3" Content="{Binding Stake}" />
                         <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
-                        <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
                         <Label Grid.Column="6" Content="{Binding LuckyAmount}" />
                         <Label Grid.Column="7" Content="{Binding System}" />
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />
@@ -248,7 +247,6 @@
                                Content="{Binding GamesPlayed}" />
                         <Label Grid.Column="3" Content="{Binding Stake}" />
                         <Label Grid.Column="4" Content="{Binding NumberOfTickets}" />
-                        <Label Grid.Column="5" Content="{Binding NumbersAmount}" />
                         <Label Grid.Column="6" Content="{Binding LuckyAmount}" />
                         <Label Grid.Column="7" Content="{Binding System}" />
                         <Label Grid.Column="8" Content="{Binding HotNumbers}" />

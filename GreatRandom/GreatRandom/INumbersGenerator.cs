@@ -11,6 +11,7 @@ namespace GreatRandom
         int MaxSystem { get; }
         int MinSystem { get; }
         int SelectAmountMax { get; }
+        int MaxNumbers { get; }
         void Load();
     }
 }

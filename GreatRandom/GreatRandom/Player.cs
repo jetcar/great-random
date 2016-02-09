@@ -26,7 +26,6 @@ namespace GreatRandom
         private Property _hotNumbers;
         private Property _coldNumbers;
         private Property _numberOfTickets;
-        private Property _numbersAmount;
         private Property _stake;
         private Property _statRange;
         private Property _system;
@@ -41,7 +40,6 @@ namespace GreatRandom
             _hotRange = GetProperty("HotRange");
             _coldNumbers = GetProperty("ColdNumbers");
             _hotNumbers = GetProperty("HotNumbers");
-            _numbersAmount = GetProperty("NumbersAmount");
             _numberOfTickets = GetProperty("NumberOfTickets");
             _stake = GetProperty("Stake");
             _statRange = GetProperty("StatRange");
@@ -219,16 +217,7 @@ namespace GreatRandom
                 _numberOfTickets.IntValue = value;
             }
         }
-        [JsonProperty]
-        public int NumbersAmount
-        {
-            get { return _numbersAmount.IntValue; }
-            set
-            {
-                if (value == _numbersAmount.IntValue) return;
-                _numbersAmount.IntValue = value;
-            }
-        }
+
 
         [JsonProperty]
         public int Stake
@@ -314,7 +303,7 @@ namespace GreatRandom
 
         public override string ToString()
         {
-            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}", NumberOfTickets, NumbersAmount, GamesPlayed, Stake, System, ColdNumbers, ColdRange, HotNumbers, HotRange, StatRange, System,TicketChangeLost,TicketChangeWon,LuckyAmount);
+            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}", NumberOfTickets,  GamesPlayed, Stake, System, ColdNumbers, ColdRange, HotNumbers, HotRange, StatRange, System,TicketChangeLost,TicketChangeWon,LuckyAmount);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

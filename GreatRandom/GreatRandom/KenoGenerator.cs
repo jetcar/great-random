@@ -12,6 +12,8 @@ namespace GreatRandom
         public int MaxSystem { get { return 10; } }
         public int MinSystem { get { return 2; } }
         public int SelectAmountMax { get { return 13; } }
+        public int MaxNumbers { get { return amount; } }
+
         public bool isLast
         {
             get

@@ -25,6 +25,7 @@ namespace GreatRandom
         public int MaxSystem { get { return 6; } }
         public int MinSystem { get { return 6; } }
         public int SelectAmountMax { get { return 7; } }
+        public int MaxNumbers { get { return amount; } }
 
         private int index = 0;
         public void Load()
